@@ -92,12 +92,18 @@ body { font-family: 'Syne', sans-serif; background: #0d0d0f; color: #e8e8e8; min
 
 /* header row */
 .grid-table thead th {
-  font-size: 10px; font-family: 'JetBrains Mono', monospace;
-  color: #444; font-weight: 400; text-align: center;
-  padding: 0 2px 8px; min-width: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center; padding: 0 2px 12px; min-width: 32px; vertical-align: bottom;
 }
-.grid-table thead th.today-hdr { color: #22c55e; font-weight: 700; }
 .grid-table thead th.habit-col { min-width: 180px; text-align: left; padding-left: 0; }
+.dow-lbl { display: block; font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.today-hdr .dow-lbl { color: #22c55e99; }
+.day-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  font-size: 11px; font-weight: 500; color: #555;
+}
+.today-hdr .day-num { background: #22c55e; color: #000; font-weight: 800; }
 
 /* habit rows */
 .grid-table tbody tr { }
@@ -454,7 +460,7 @@ function renderGrid() {
     const key   = dk(vYear, vMonth, d);
     const dow   = new Date(vYear, vMonth, d).getDay();
     const isT   = key === today;
-    hdr.innerHTML += `<th class="${isT?'today-hdr':''}" title="${WDAYS[dow]}">${d}</th>`;
+    hdr.innerHTML += `<th class="${isT?'today-hdr':''}"><span class="dow-lbl">${WDAYS[dow].slice(0,2)}</span><span class="day-num">${d}</span></th>`;
   }
 
   // Body
