@@ -165,35 +165,55 @@ body {
 .cell {
   width: 28px; height: 28px; border-radius: 50%;
   cursor: pointer;
-  border: 1.5px solid #e0e0e0;
-  background: transparent;
+  border: 1.5px solid #dadce0;
+  background: #f1f3f4;
   transition: all .15s;
   position: relative;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto;
 }
-.cell:hover {
-  background: #e8f0fe;
-  border-color: #1a73e8;
-}
-.cell.done {
-  background: #1a73e8;
-  border-color: #1a73e8;
-}
-.cell.done::after {
-  content: '';
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #fff;
-  display: block;
-}
-.cell.done:hover { background: #1765cc; border-color: #1765cc; }
-.cell.is-today { border-color: #1a73e8; }
-.cell.has-note .note-dot {
-  position: absolute; bottom: 2px; right: 2px;
-  width: 4px; height: 4px; border-radius: 50%;
-  background: #fbbc04;
-}
+.cell.s-none { background: #f1f3f4; border-color: #dadce0; }
+.cell.s-red   { background: #fce8e6; border-color: #ea4335; }
+.cell.s-yellow{ background: #fef7e0; border-color: #fbbc04; }
+.cell.s-green { background: #e6f4ea; border-color: #34a853; }
+.cell.is-today.s-none { border-color: #1a73e8; background: #e8f0fe; }
 .cell.active-cell { box-shadow: 0 0 0 3px #e8f0fe; }
+
+/* hover menu */
+.cell-wrap { position: relative; display: inline-block; }
+.cell-menu {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  padding: 8px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+  white-space: nowrap;
+}
+.cell-wrap:hover .cell-menu { display: flex; }
+.cell-menu-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 6px;
+  font-size: 12px; font-family: 'Google Sans', sans-serif;
+  font-weight: 500; color: #3c4043; cursor: pointer;
+  transition: background .1s;
+}
+.cell-menu-row:hover { background: #f1f3f4; }
+.cm-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.cm-dot.red    { background: #ea4335; }
+.cm-dot.yellow { background: #fbbc04; }
+.cm-dot.green  { background: #34a853; }
+.cm-desc { color: #1a73e8; }
+.cell-menu-row.cm-desc:hover { background: #e8f0fe; }
 
 /* ── ADD HABIT ── */
 .add-row {
@@ -297,6 +317,18 @@ body {
 }
 .save-btn:hover { background: #1765cc; }
 .save-ok { font-size: 12px; color: #34a853; display: none; }
+
+/* status buttons in panel */
+.sbtn {
+  flex: 1; padding: 7px 4px; border-radius: 8px;
+  border: 1.5px solid #dadce0; background: #fff;
+  font-size: 11px; font-family: 'Google Sans', sans-serif; font-weight: 600;
+  cursor: pointer; transition: all .15s; color: #3c4043; text-align: center;
+}
+.sbtn:hover { background: #f1f3f4; }
+.sbtn.active-red    { background: #fce8e6; border-color: #ea4335; color: #c5221f; }
+.sbtn.active-yellow { background: #fef7e0; border-color: #fbbc04; color: #b06000; }
+.sbtn.active-green  { background: #e6f4ea; border-color: #34a853; color: #137333; }
 </style>
 </head>
 <body>
@@ -362,9 +394,10 @@ body {
       </div>
       <button class="panel-close" id="panel-close">×</button>
     </div>
-    <div class="done-toggle" id="done-toggle">
-      <div class="check-box" id="check-box"></div>
-      <div class="check-lbl" id="check-lbl">Mark as done</div>
+    <div style="display:flex;gap:6px;" id="status-btns">
+      <button class="sbtn sbtn-red"   data-s="red"    onclick="setPanelStatus('red')">🔴 Not done</button>
+      <button class="sbtn sbtn-yellow" data-s="yellow" onclick="setPanelStatus('yellow')">🟡 In progress</button>
+      <button class="sbtn sbtn-green" data-s="green"  onclick="setPanelStatus('green')">🟢 Done</button>
     </div>
     <div>
       <div class="note-lbl" style="margin-bottom:6px">Notes</div>
@@ -533,12 +566,22 @@ function renderGrid(){
 
       const td  = document.createElement('td');
       td.className = 'cell-td';
+      const status = c.status || 'none';
+      const wrap = document.createElement('div');
+      wrap.className = 'cell-wrap';
       const div = document.createElement('div');
-      div.className = ['cell', done?'done':'', isT?'is-today':''].join(' ').trim();
+      div.className = ['cell', 's-'+status, isT?'is-today':''].join(' ').trim();
       div.dataset.habit = h.id;
       div.dataset.dk    = key;
-      if(note){ const dot=document.createElement('div'); dot.className='note-dot'; div.appendChild(dot); }
-      td.appendChild(div);
+      // hover menu
+      wrap.innerHTML = `<div class="cell-menu">
+        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','red')"><span class="cm-dot red"></span>Not done</div>
+        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','yellow')"><span class="cm-dot yellow"></span>In progress</div>
+        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','green')"><span class="cm-dot green"></span>Done</div>
+        <div class="cell-menu-row cm-desc" onclick="openPanelFromMenu(event,'${h.id}','${key}')">✏️ Add note</div>
+      </div>`;
+      wrap.insertBefore(div, wrap.firstChild);
+      td.appendChild(wrap);
       tr.appendChild(td);
     }
     body.appendChild(tr);
@@ -546,8 +589,6 @@ function renderGrid(){
 
   // Event delegation
   body.onclick = e => {
-    const cell = e.target.closest('.cell');
-    if(cell){ openPanel(cell, cell.dataset.habit, cell.dataset.dk); return; }
     const del = e.target.closest('.h-del');
     if(del) deleteHabit(del.dataset.id);
   };
@@ -584,11 +625,11 @@ function openPanel(cellEl, habitId, dk){
 
 function refreshPanel(){
   if(!panel) return;
-  const c    = cells[`${panel.habitId}_${panel.dk}`] || {};
-  const done = !!c.done;
-  const box  = $('check-box');
-  box.className = 'check-box' + (done?' done':'');
-  $('check-lbl').textContent = done ? 'Done ✓' : 'Mark as done';
+  const c      = cells[panel.habitId+'_'+panel.dk] || {};
+  const status = c.status || 'none';
+  document.querySelectorAll('.sbtn').forEach(b => {
+    b.className = 'sbtn' + (b.dataset.s===status ? ' active-'+status : '');
+  });
   $('note-ta').value = c.note || '';
   $('save-ok').style.display = 'none';
 }
@@ -609,6 +650,31 @@ $('save-btn').onclick = async () => {
   await setDoc(cDoc(key), {...curr, note:$('note-ta').value, habitId:panel.habitId, date:panel.dk}, {merge:true});
   $('save-ok').style.display = 'inline';
   setTimeout(()=>{ closePanel(); }, 800);
+};
+
+window.quickStatus = async (e, habitId, dk, status) => {
+  e.stopPropagation();
+  const key  = habitId + '_' + dk;
+  const curr = cells[key] || {};
+  setSync('saving');
+  await setDoc(cDoc(key), {...curr, status, done: status==='green', habitId, date:dk}, {merge:true});
+};
+
+window.openPanelFromMenu = (e, habitId, dk) => {
+  e.stopPropagation();
+  const cellEl = document.querySelector(`.cell[data-habit="${habitId}"][data-dk="${dk}"]`);
+  if(cellEl) openPanel(cellEl, habitId, dk);
+};
+
+window.setPanelStatus = async (status) => {
+  if(!panel) return;
+  const key  = panel.habitId + '_' + panel.dk;
+  const curr = cells[key] || {};
+  setSync('saving');
+  await setDoc(cDoc(key), {...curr, status, done: status==='green', habitId:panel.habitId, date:panel.dk}, {merge:true});
+  document.querySelectorAll('.sbtn').forEach(b => {
+    b.className = 'sbtn' + (b.dataset.s===status ? ' active-'+status : '');
+  });
 };
 
 $('panel-close').onclick = closePanel;
