@@ -608,7 +608,7 @@ $('save-btn').onclick = async () => {
   setSync('saving');
   await setDoc(cDoc(key), {...curr, note:$('note-ta').value, habitId:panel.habitId, date:panel.dk}, {merge:true});
   $('save-ok').style.display = 'inline';
-  setTimeout(()=>{ $('save-ok').style.display='none'; }, 2000);
+  setTimeout(()=>{ closePanel(); }, 800);
 };
 
 $('panel-close').onclick = closePanel;
