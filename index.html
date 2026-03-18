@@ -185,7 +185,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjGmlh9HgjsbrrYQXxGPwXvjdy_B9qzRk",
@@ -274,26 +274,23 @@ onAuthStateChanged(auth, async user => {
 
 async function initHabits() {
   const habitsCol = collection(db, ...uRef('habits'));
-  const q = query(habitsCol, orderBy('order','asc'));
-
-  // First check if empty, seed if needed
-  const initialSnap = await getDocs(q);
-  if (initialSnap.empty) {
-    await Promise.all(DEFAULT_HABITS.map((h,i) =>
-      setDoc(doc(db, ...uRef('habits', h.id)), {...h, order:i})
-    ));
+  // Check if empty, seed defaults
+  const snap = await getDocs(habitsCol);
+  if (snap.empty) {
+    for (let i = 0; i < DEFAULT_HABITS.length; i++) {
+      const h = DEFAULT_HABITS[i];
+      await setDoc(doc(db, ...uRef('habits', h.id)), {...h, order: i});
+    }
   }
-
-  // Now listen for realtime updates
-  const unsub = onSnapshot(q, snap => {
-    habits = snap.docs.map(d=>d.data()).sort((a,b)=>a.order-b.order);
+  // Realtime listener — no orderBy so no index needed
+  const unsub = onSnapshot(habitsCol, snap => {
+    habits = snap.docs.map(d => d.data()).sort((a,b) => (a.order||0) - (b.order||0));
     renderGrid();
   });
   unsubs.push(unsub);
 }
 
 function initCells() {
-  // listen to all cell data for current user
   const cellsCol = collection(db, ...uRef('cells'));
   const unsub = onSnapshot(cellsCol, snap => {
     cellData = {};
