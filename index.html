@@ -179,35 +179,33 @@ body {
 .cell.is-today.s-none { border-color: #1a73e8; background: #e8f0fe; }
 .cell.active-cell { box-shadow: 0 0 0 3px #e8f0fe; }
 
-/* hover menu */
+/* click menu */
 .cell-wrap { position: relative; display: inline-block; }
 .cell-menu {
   display: none;
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
+  position: fixed;
+  z-index: 9999;
   background: #fff;
   border: 1px solid #dadce0;
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.15);
-  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  padding: 6px;
   flex-direction: column;
-  gap: 4px;
-  min-width: 150px;
+  gap: 2px;
+  min-width: 160px;
   white-space: nowrap;
 }
-.cell-wrap:hover .cell-menu { display: flex; }
+.cell-menu.visible { display: flex; }
 .cell-menu-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 8px; border-radius: 6px;
-  font-size: 12px; font-family: 'Google Sans', sans-serif;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 6px;
+  font-size: 13px; font-family: 'Google Sans', sans-serif;
   font-weight: 500; color: #3c4043; cursor: pointer;
   transition: background .1s;
 }
 .cell-menu-row:hover { background: #f1f3f4; }
 .cm-dot {
-  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
 }
 .cm-dot.red    { background: #ea4335; }
 .cm-dot.yellow { background: #fbbc04; }
@@ -574,12 +572,16 @@ function renderGrid(){
       div.dataset.habit = h.id;
       div.dataset.dk    = key;
       // hover menu
-      wrap.innerHTML = `<div class="cell-menu">
-        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','red')"><span class="cm-dot red"></span>Not done</div>
-        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','yellow')"><span class="cm-dot yellow"></span>In progress</div>
-        <div class="cell-menu-row" onclick="quickStatus(event,'${h.id}','${key}','green')"><span class="cm-dot green"></span>Done</div>
-        <div class="cell-menu-row cm-desc" onclick="openPanelFromMenu(event,'${h.id}','${key}')">✏️ Add note</div>
-      </div>`;
+      const menu = document.createElement('div');
+      menu.className = 'cell-menu';
+      menu.dataset.habit = h.id;
+      menu.dataset.dk = key;
+      menu.innerHTML = `
+        <div class="cell-menu-row" data-action="red"><span class="cm-dot red"></span>Not done</div>
+        <div class="cell-menu-row" data-action="yellow"><span class="cm-dot yellow"></span>In progress</div>
+        <div class="cell-menu-row" data-action="green"><span class="cm-dot green"></span>Done</div>
+        <div class="cell-menu-row cm-desc" data-action="note">✏️ Add note</div>`;
+      wrap.appendChild(menu);
       wrap.insertBefore(div, wrap.firstChild);
       td.appendChild(wrap);
       tr.appendChild(td);
@@ -590,7 +592,44 @@ function renderGrid(){
   // Event delegation
   body.onclick = e => {
     const del = e.target.closest('.h-del');
-    if(del) deleteHabit(del.dataset.id);
+    if(del){ deleteHabit(del.dataset.id); return; }
+
+    // Click on a cell — show/hide menu
+    const cell = e.target.closest('.cell');
+    if(cell){
+      e.stopPropagation();
+      closeAllMenus();
+      const menu = cell.parentElement.querySelector('.cell-menu');
+      if(menu){
+        const r = cell.getBoundingClientRect();
+        menu.style.left = r.left + 'px';
+        menu.style.top  = (r.bottom + 4) + 'px';
+        // keep on screen
+        menu.classList.add('visible');
+        const mr = menu.getBoundingClientRect();
+        if(mr.right > window.innerWidth - 8) menu.style.left = (window.innerWidth - mr.width - 8) + 'px';
+        if(mr.bottom > window.innerHeight - 8) menu.style.top = (r.top - mr.height - 4) + 'px';
+      }
+      return;
+    }
+
+    // Click on a menu row
+    const row = e.target.closest('.cell-menu-row');
+    if(row){
+      e.stopPropagation();
+      const menu = row.closest('.cell-menu');
+      const habitId = menu.dataset.habit;
+      const dk = menu.dataset.dk;
+      const action = row.dataset.action;
+      closeAllMenus();
+      if(action === 'note'){
+        const cellEl = document.querySelector(`.cell[data-habit="${habitId}"][data-dk="${dk}"]`);
+        if(cellEl) openPanel(cellEl, habitId, dk);
+      } else {
+        quickStatus(habitId, dk, action);
+      }
+      return;
+    }
   };
 }
 
@@ -652,19 +691,20 @@ $('save-btn').onclick = async () => {
   setTimeout(()=>{ closePanel(); }, 800);
 };
 
-window.quickStatus = async (e, habitId, dk, status) => {
-  e.stopPropagation();
+function closeAllMenus(){
+  document.querySelectorAll('.cell-menu.visible').forEach(m => m.classList.remove('visible'));
+}
+// Close menu on outside click
+document.addEventListener('click', () => closeAllMenus());
+
+window.quickStatus = async (habitId, dk, status) => {
   const key  = habitId + '_' + dk;
   const curr = cells[key] || {};
   setSync('saving');
   await setDoc(cDoc(key), {...curr, status, done: status==='green', habitId, date:dk}, {merge:true});
 };
 
-window.openPanelFromMenu = (e, habitId, dk) => {
-  e.stopPropagation();
-  const cellEl = document.querySelector(`.cell[data-habit="${habitId}"][data-dk="${dk}"]`);
-  if(cellEl) openPanel(cellEl, habitId, dk);
-};
+
 
 window.setPanelStatus = async (status) => {
   if(!panel) return;
