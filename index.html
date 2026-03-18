@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --bg: #F7F5F0; --surface: #FFFFFF; --surface2: #F0EDE6;
       --border: rgba(0,0,0,0.1); --text: #1A1A18; --text2: #6B6860; --text3: #A8A59E;
@@ -20,39 +19,60 @@
       --accent: #52B788; --accent-light: #1B4332; --accent-text: #D8F3DC;
       --danger: #E74C3C; --danger-light: #3B1A1A;
     }
-
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
-    header { max-width: 640px; margin: 0 auto; padding: 2.5rem 1.5rem 1rem; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text); letter-spacing: -0.5px; }
+    /* AUTH SCREEN */
+    #auth-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 2rem;
+    }
+    .auth-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2.5rem 2rem; max-width: 380px; width: 100%; text-align: center;
+    }
+    .auth-logo { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--text); margin-bottom: 0.25rem; }
+    .auth-logo span { color: var(--accent); }
+    .auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px 20px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+      color: var(--text); cursor: pointer; transition: background 0.2s;
+    }
+    .google-btn:hover { background: var(--surface2); }
+    .google-btn svg { flex-shrink: 0; }
+
+    /* APP SCREEN */
+    #app-screen { display: none; }
+    header { max-width: 640px; margin: 0 auto; padding: 2rem 1.5rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); }
     .logo span { color: var(--accent); }
     .header-right { display: flex; gap: 8px; align-items: center; }
+    .user-info { display: flex; align-items: center; gap: 8px; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+    .avatar-fallback { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-light); color: var(--accent-text); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
     .sync-status { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); transition: background 0.3s; }
     .sync-dot.synced { background: var(--accent); }
     .sync-dot.syncing { background: #f59e0b; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-    .theme-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 6px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text2); cursor: pointer; transition: all 0.2s; }
-    .theme-btn:hover { background: var(--surface2); }
+    .icon-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 6px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+    .icon-btn:hover { background: var(--surface2); }
 
     main { max-width: 640px; margin: 0 auto; padding: 0 1.5rem 4rem; }
-
     .stats-row { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .stat-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 5px 14px; font-size: 13px; color: var(--text2); }
     .stat-pill strong { color: var(--text); font-weight: 500; }
 
     .add-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; }
     .add-row { display: flex; gap: 8px; margin-bottom: 10px; }
-
     input[type="text"] { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; }
     input[type="text"]::placeholder { color: var(--text3); }
     input[type="text"]:focus { border-color: var(--accent); }
-
     .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
     .add-btn:hover { opacity: 0.88; }
     .add-btn:active { transform: scale(0.97); }
-
     .tag-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .tag-row label { font-size: 12px; color: var(--text3); margin-right: 2px; }
     .tag-input { flex: 1; min-width: 120px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; }
@@ -64,67 +84,79 @@
     .filter-btn:hover, .filter-btn.active { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
 
     .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin: 1.25rem 0 0.5rem; }
-
     .task-list { display: flex; flex-direction: column; gap: 6px; }
     .task-item { display: flex; align-items: flex-start; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; transition: opacity 0.2s; animation: slideIn 0.2s ease; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
     .task-item.done { opacity: 0.45; }
-
     .cb-wrap { flex-shrink: 0; margin-top: 2px; }
     input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
-
     .task-body { flex: 1; min-width: 0; }
     .task-text { font-size: 15px; color: var(--text); cursor: pointer; word-break: break-word; line-height: 1.4; }
     .task-item.done .task-text { text-decoration: line-through; color: var(--text3); }
-
     .task-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
-    .tag-badge { font-size: 11px; padding: 2px 8px; border-radius: 50px; background: var(--accent-light); color: var(--accent-text); font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+    .tag-badge { font-size: 11px; padding: 2px 8px; border-radius: 50px; background: var(--accent-light); color: var(--accent-text); font-weight: 500; cursor: pointer; }
     .tag-badge:hover { opacity: 0.7; }
-
     .del-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; margin-top: 1px; }
     .del-btn:hover { color: var(--danger); background: var(--danger-light); }
-
     .empty { text-align: center; padding: 3rem 0; color: var(--text3); font-size: 15px; }
     .loading { text-align: center; padding: 3rem 0; color: var(--text3); font-size: 14px; }
-
     .bottom-row { display: flex; justify-content: flex-end; margin-top: 1rem; }
     .clear-btn { background: none; border: none; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text3); cursor: pointer; text-decoration: underline; padding: 0; }
     .clear-btn:hover { color: var(--danger); }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">Check<span>ly</span></div>
-    <div class="header-right">
-      <div class="sync-status">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">connecting...</span>
-      </div>
-      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">Check<span>ly</span></div>
+      <div class="auth-sub">Your personal daily checklist</div>
+      <button class="google-btn" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
     </div>
-  </header>
-  <main>
-    <div class="stats-row" id="stats-row"></div>
-    <div class="add-card">
-      <div class="add-row">
-        <input type="text" id="task-input" placeholder="What needs to be done?" />
-        <button class="add-btn" onclick="addTask()">+ Add</button>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="app-screen">
+    <header>
+      <div class="logo">Check<span>ly</span></div>
+      <div class="header-right">
+        <div class="sync-status">
+          <div class="sync-dot" id="sync-dot"></div>
+          <span id="sync-label">syncing...</span>
+        </div>
+        <div class="user-info" id="user-info"></div>
+        <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+        <button class="icon-btn" onclick="signOut()">Sign out</button>
       </div>
-      <div class="tag-row">
-        <label>Tags:</label>
-        <input type="text" class="tag-input" id="tag-input" placeholder="work, personal, urgent..." />
+    </header>
+    <main>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="add-card">
+        <div class="add-row">
+          <input type="text" id="task-input" placeholder="What needs to be done?" />
+          <button class="add-btn" onclick="addTask()">+ Add</button>
+        </div>
+        <div class="tag-row">
+          <label>Tags:</label>
+          <input type="text" class="tag-input" id="tag-input" placeholder="work, personal, urgent..." />
+        </div>
+        <div class="tag-hint">Separate tags with commas. Click a tag to filter.</div>
       </div>
-      <div class="tag-hint">Separate tags with commas. Click a tag to filter.</div>
-    </div>
-    <div class="filter-row" id="filter-row"></div>
-    <div id="task-container"><div class="loading">Connecting to database...</div></div>
-    <div class="bottom-row">
-      <button class="clear-btn" onclick="clearDone()">Clear completed</button>
-    </div>
-  </main>
+      <div class="filter-row" id="filter-row"></div>
+      <div id="task-container"><div class="loading">Loading tasks...</div></div>
+      <div class="bottom-row">
+        <button class="clear-btn" onclick="clearDone()">Clear completed</button>
+      </div>
+    </main>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -137,11 +169,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const tasksCol = collection(db, "tasks");
+    const provider = new GoogleAuthProvider();
 
-    let tasks = [];
-    let activeFilter = null;
+    let tasks = [], activeFilter = null, unsubscribe = null;
 
     function setSyncStatus(s) {
       const dot = document.getElementById('sync-dot');
@@ -151,67 +183,86 @@
       else { dot.className = 'sync-dot'; lbl.textContent = 'offline'; }
     }
 
-    const q = query(tasksCol, orderBy("createdAt", "desc"));
-    onSnapshot(q, snap => {
-      tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setSyncStatus('synced');
-      render();
-    }, err => { console.error(err); setSyncStatus('offline'); });
+    window.signInWithGoogle = async function() {
+      try { await signInWithPopup(auth, provider); } catch(e) { console.error(e); }
+    };
 
-    function parseTags(str) {
-      return str.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-    }
+    window.signOut = async function() {
+      if (unsubscribe) unsubscribe();
+      await fbSignOut(auth);
+    };
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+        // Show user avatar
+        const ui = document.getElementById('user-info');
+        if (user.photoURL) {
+          ui.innerHTML = `<img class="avatar" src="${user.photoURL}" alt="${user.displayName}" />`;
+        } else {
+          const initials = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+          ui.innerHTML = `<div class="avatar-fallback">${initials}</div>`;
+        }
+        // Listen to this user's tasks
+        const tasksCol = collection(db, "users", user.uid, "tasks");
+        const q = query(tasksCol, orderBy("createdAt", "desc"));
+        if (unsubscribe) unsubscribe();
+        unsubscribe = onSnapshot(q, snap => {
+          tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          setSyncStatus('synced');
+          render(user.uid);
+        }, err => { console.error(err); setSyncStatus('offline'); });
+      } else {
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('app-screen').style.display = 'none';
+        tasks = [];
+      }
+    });
+
+    function getTasksCol(uid) { return collection(db, "users", uid, "tasks"); }
 
     window.addTask = async function() {
-      const text = document.getElementById('task-input').value.trim();
-      if (!text) return;
-      const tags = parseTags(document.getElementById('tag-input').value);
+      const user = auth.currentUser; if (!user) return;
+      const text = document.getElementById('task-input').value.trim(); if (!text) return;
+      const tags = document.getElementById('tag-input').value.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);
       document.getElementById('task-input').value = '';
       document.getElementById('tag-input').value = '';
       setSyncStatus('syncing');
-      await addDoc(tasksCol, { text, tags, done: false, createdAt: Date.now() });
+      await addDoc(getTasksCol(user.uid), { text, tags, done: false, createdAt: Date.now() });
     };
 
     window.toggle = async function(id) {
-      const t = tasks.find(t => t.id === id);
-      if (!t) return;
+      const user = auth.currentUser; if (!user) return;
+      const t = tasks.find(t => t.id === id); if (!t) return;
       setSyncStatus('syncing');
-      await updateDoc(doc(db, "tasks", id), { done: !t.done });
+      await updateDoc(doc(db, "users", user.uid, "tasks", id), { done: !t.done });
     };
 
     window.remove = async function(id) {
+      const user = auth.currentUser; if (!user) return;
       setSyncStatus('syncing');
-      await deleteDoc(doc(db, "tasks", id));
+      await deleteDoc(doc(db, "users", user.uid, "tasks", id));
     };
 
     window.clearDone = async function() {
-      const done = tasks.filter(t => t.done);
-      if (!done.length) return;
+      const user = auth.currentUser; if (!user) return;
+      const done = tasks.filter(t => t.done); if (!done.length) return;
       setSyncStatus('syncing');
-      await Promise.all(done.map(t => deleteDoc(doc(db, "tasks", t.id))));
+      await Promise.all(done.map(t => deleteDoc(doc(db, "users", user.uid, "tasks", t.id))));
     };
 
     window.setFilter = function(tag) {
       activeFilter = activeFilter === tag ? null : tag;
-      render();
+      render(auth.currentUser?.uid);
     };
 
-    function allTags() {
-      const set = new Set();
-      tasks.forEach(t => (t.tags || []).forEach(tag => set.add(tag)));
-      return [...set];
-    }
-
-    function escHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+    function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     function taskHTML(t) {
-      const tagBadges = (t.tags || []).map(tag =>
-        `<span class="tag-badge" onclick="setFilter('${tag}');event.stopPropagation()">#${tag}</span>`
-      ).join('');
-      return `<div class="task-item ${t.done ? 'done' : ''}">
-        <div class="cb-wrap"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggle('${t.id}')" /></div>
+      const tagBadges = (t.tags||[]).map(tag => `<span class="tag-badge" onclick="setFilter('${tag}');event.stopPropagation()">#${tag}</span>`).join('');
+      return `<div class="task-item ${t.done?'done':''}">
+        <div class="cb-wrap"><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}')" /></div>
         <div class="task-body">
           <div class="task-text" onclick="toggle('${t.id}')">${escHtml(t.text)}</div>
           ${(t.tags||[]).length ? `<div class="task-tags">${tagBadges}</div>` : ''}
@@ -220,22 +271,22 @@
       </div>`;
     }
 
-    function render() {
-      const total = tasks.length, done = tasks.filter(t => t.done).length;
+    function render(uid) {
+      const total = tasks.length, done = tasks.filter(t=>t.done).length;
       document.getElementById('stats-row').innerHTML = `
         <div class="stat-pill"><strong>${total}</strong> total</div>
         <div class="stat-pill"><strong>${done}</strong> done</div>
-        <div class="stat-pill"><strong>${total - done}</strong> remaining</div>`;
+        <div class="stat-pill"><strong>${total-done}</strong> remaining</div>`;
 
-      const tags = allTags();
+      const tags = [...new Set(tasks.flatMap(t => t.tags||[]))];
       document.getElementById('filter-row').innerHTML = tags.length
         ? `<button class="filter-btn ${!activeFilter?'active':''}" onclick="setFilter(null)">All</button>` +
           tags.map(tag => `<button class="filter-btn ${activeFilter===tag?'active':''}" onclick="setFilter('${tag}')">#${tag}</button>`).join('')
         : '';
 
-      const filtered = activeFilter ? tasks.filter(t => (t.tags||[]).includes(activeFilter)) : tasks;
-      const pending = filtered.filter(t => !t.done);
-      const completed = filtered.filter(t => t.done);
+      const filtered = activeFilter ? tasks.filter(t=>(t.tags||[]).includes(activeFilter)) : tasks;
+      const pending = filtered.filter(t=>!t.done);
+      const completed = filtered.filter(t=>t.done);
 
       let html = '';
       if (!filtered.length) {
@@ -247,20 +298,18 @@
       document.getElementById('task-container').innerHTML = html;
     }
 
-    document.getElementById('task-input').addEventListener('keydown', e => { if (e.key==='Enter') window.addTask(); });
-    document.getElementById('tag-input').addEventListener('keydown', e => { if (e.key==='Enter') window.addTask(); });
+    document.getElementById('task-input').addEventListener('keydown', e => { if(e.key==='Enter') window.addTask(); });
+    document.getElementById('tag-input').addEventListener('keydown', e => { if(e.key==='Enter') window.addTask(); });
 
     window.toggleTheme = function() {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      document.getElementById('theme-btn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
+      document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
       localStorage.setItem('checkly-theme', isDark ? 'light' : 'dark');
     };
-
-    const saved = localStorage.getItem('checkly-theme');
-    if (saved === 'dark') {
+    if (localStorage.getItem('checkly-theme') === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
-      document.getElementById('theme-btn').textContent = '☀️ Light';
+      document.getElementById('theme-btn').textContent = '☀️';
     }
   </script>
 </body>
