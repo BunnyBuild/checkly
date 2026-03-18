@@ -3,318 +3,387 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DevOS</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<title>DevOS — Habit Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Syne', sans-serif; background: #0d0d0f; color: #e8e8e8; min-height: 100vh; }
+
+body {
+  font-family: 'Google Sans', 'Segoe UI', sans-serif;
+  background: #fff;
+  color: #202124;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  position: sticky; top: 0; z-index: 200;
+}
+.brand { font-size: 20px; font-weight: 700; color: #202124; letter-spacing: -.5px; }
+.brand span { color: #1a73e8; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.sdot { width: 8px; height: 8px; border-radius: 50%; background: #dadce0; }
+.sdot.green { background: #34a853; }
+.sdot.amber { background: #fbbc04; animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.tbtn {
+  border: 1px solid #dadce0; border-radius: 6px;
+  padding: 6px 14px; font-size: 13px;
+  font-family: 'Google Sans', sans-serif; font-weight: 500;
+  color: #3c4043; background: #fff; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.tbtn:hover { background: #f1f3f4; }
+.uavatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.uavatar-text {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #e8f0fe; color: #1a73e8;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
 
 /* ── AUTH ── */
 #auth {
   display: flex; align-items: center; justify-content: center;
-  min-height: 100vh;
+  min-height: 100vh; background: #f8f9fa;
 }
 .auth-box {
-  background: #111114; border: 1px solid #ffffff15;
-  border-radius: 16px; padding: 2.5rem 2rem;
-  width: 340px; text-align: center;
+  background: #fff; border: 1px solid #dadce0;
+  border-radius: 12px; padding: 2.5rem 2rem;
+  width: 360px; text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
-.auth-box h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
-.auth-box h1 span { color: #22c55e; }
-.auth-box p { font-size: 12px; color: #555; font-family: 'JetBrains Mono', monospace; margin-bottom: 2rem; }
+.auth-box h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.auth-box h1 span { color: #1a73e8; }
+.auth-box p { font-size: 13px; color: #5f6368; margin-bottom: 2rem; }
 .google-btn {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; padding: 12px; background: #1a1a1e;
-  border: 1px solid #ffffff18; border-radius: 10px;
-  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
-  color: #e8e8e8; cursor: pointer; transition: border-color .2s;
+  width: 100%; padding: 12px;
+  background: #fff; border: 1px solid #dadce0; border-radius: 8px;
+  font-family: 'Google Sans', sans-serif; font-size: 14px; font-weight: 500;
+  color: #3c4043; cursor: pointer; transition: background .15s, box-shadow .15s;
 }
-.google-btn:hover { border-color: #22c55e; }
+.google-btn:hover { background: #f8f9fa; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
 
 /* ── APP ── */
-#app { display: none; }
+#app { display: none; background: #fff; min-height: 100vh; }
 
-/* topbar */
-.topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px; border-bottom: 1px solid #ffffff0a;
-  position: sticky; top: 0; background: #0d0d0f; z-index: 100;
-}
-.topbar h1 { font-size: 16px; font-weight: 800; }
-.topbar h1 span { color: #22c55e; }
-.topbar-right { display: flex; align-items: center; gap: 8px; }
-.tbtn {
-  background: #1a1a1e; border: 1px solid #ffffff12;
-  border-radius: 20px; padding: 5px 12px;
-  font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 700;
-  color: #888; cursor: pointer; transition: all .15s;
-}
-.tbtn:hover { color: #e8e8e8; border-color: #ffffff25; }
-.sdot { width: 7px; height: 7px; border-radius: 50%; background: #333; }
-.sdot.green { background: #22c55e; }
-.sdot.amber { background: #f59e0b; animation: blink 1s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-.uavatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.uavatar-text {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: #052e16; color: #22c55e;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-}
+/* ── MAIN AREA ── */
+.main { padding: 20px 24px; max-width: 100%; }
 
-/* layout */
-.layout { display: flex; height: calc(100vh - 49px); overflow: hidden; }
-.left { flex: 1; overflow: auto; padding: 20px; }
-
-/* month nav */
-.mnav { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+/* month nav — Google Calendar style */
+.mnav {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
+}
+.mnav-title { font-size: 22px; font-weight: 400; color: #3c4043; min-width: 180px; }
 .mnav-btn {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: #1a1a1e; border: 1px solid #ffffff12;
-  color: #888; cursor: pointer; font-size: 15px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: transparent; border: none;
+  color: #3c4043; cursor: pointer; font-size: 18px;
   display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
+  transition: background .15s;
 }
-.mnav-btn:hover { color: #e8e8e8; border-color: #ffffff25; }
-.mnav-title { font-size: 17px; font-weight: 800; min-width: 150px; }
+.mnav-btn:hover { background: #f1f3f4; }
 .today-pill {
-  font-size: 11px; font-family: 'JetBrains Mono', monospace;
-  padding: 4px 10px; border-radius: 20px;
-  background: #1a1a1e; border: 1px solid #ffffff12;
-  color: #666; cursor: pointer; transition: all .15s;
+  border: 1px solid #dadce0; border-radius: 6px;
+  padding: 6px 14px; font-size: 13px; font-weight: 500;
+  color: #3c4043; background: #fff; cursor: pointer;
+  transition: background .15s;
 }
-.today-pill:hover { color: #22c55e; border-color: #22c55e44; }
+.today-pill:hover { background: #f1f3f4; }
 
-/* grid */
-.grid-scroll { overflow-x: auto; padding-bottom: 8px; }
-.grid-table { border-collapse: collapse; min-width: max-content; }
+/* ── CALENDAR GRID ── */
+.cal-wrap { overflow-x: auto; }
+.cal-table {
+  border-collapse: collapse;
+  min-width: max-content;
+  width: 100%;
+}
 
-/* header row */
-.grid-table thead th {
-  font-family: 'JetBrains Mono', monospace;
-  text-align: center; padding: 0 2px 12px; min-width: 32px; vertical-align: bottom;
+/* Column header — Google Calendar style */
+.cal-table thead th {
+  text-align: center;
+  padding: 0 4px 12px;
+  min-width: 36px;
+  border-bottom: 1px solid #e0e0e0;
 }
-.grid-table thead th.habit-col { min-width: 180px; text-align: left; padding-left: 0; }
-.dow-lbl { display: block; font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
-.today-hdr .dow-lbl { color: #22c55e99; }
-.day-num {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; border-radius: 50%;
-  font-size: 11px; font-weight: 500; color: #555;
+.cal-table thead th.name-col {
+  min-width: 200px; text-align: left;
+  padding-left: 0; padding-right: 16px;
 }
-.today-hdr .day-num { background: #22c55e; color: #000; font-weight: 800; }
+.col-inner {
+  display: inline-flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.col-dow {
+  font-size: 11px; font-weight: 500;
+  color: #70757a; text-transform: uppercase; letter-spacing: .04em;
+}
+.col-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 400; color: #3c4043;
+}
+.today-col .col-dow { color: #1a73e8; }
+.today-col .col-num {
+  background: #1a73e8; color: #fff;
+  font-weight: 700;
+}
 
-/* habit rows */
-.grid-table tbody tr { }
-.grid-table tbody td { padding: 2px; vertical-align: middle; }
-.habit-name-cell {
-  padding-right: 12px !important;
-  padding-left: 0 !important;
+/* Habit rows */
+.cal-table tbody tr {
+  border-bottom: 1px solid #f1f3f4;
 }
-.habit-name-wrap {
-  display: flex; align-items: center; gap: 6px;
-  max-width: 170px;
+.cal-table tbody tr:hover { background: #fafafa; }
+.cal-table tbody td {
+  padding: 6px 4px; vertical-align: middle;
 }
-.h-emoji { font-size: 14px; flex-shrink: 0; }
+.habit-td { padding-left: 0 !important; padding-right: 16px !important; }
+.habit-wrap {
+  display: flex; align-items: center; gap: 8px;
+  max-width: 190px;
+}
+.h-emoji { font-size: 15px; flex-shrink: 0; }
 .h-name {
-  font-size: 12px; font-weight: 700; color: #999;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1;
+  font-size: 13px; font-weight: 500; color: #3c4043;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
 }
 .h-del {
-  background: none; border: none; color: #333; cursor: pointer;
-  font-size: 12px; padding: 2px 4px; border-radius: 4px;
-  opacity: 0; transition: opacity .15s, color .15s;
-  flex-shrink: 0;
+  background: none; border: none; color: #dadce0;
+  cursor: pointer; font-size: 13px; padding: 2px 5px;
+  border-radius: 4px; opacity: 0; transition: all .15s; flex-shrink: 0;
 }
-.grid-table tbody tr:hover .h-del { opacity: 1; }
-.h-del:hover { color: #ef4444; background: #450a0a; }
+.cal-table tbody tr:hover .h-del { opacity: 1; }
+.h-del:hover { color: #d93025; background: #fce8e6; }
 
-/* cells */
-.cell-td { padding: 2px !important; }
+/* Cells */
+.cell-td { padding: 6px 4px !important; }
 .cell {
-  width: 24px; height: 24px; border-radius: 4px;
-  background: #1c1c22; cursor: pointer;
-  border: 1.5px solid transparent;
-  transition: transform .1s, border-color .1s;
-  position: relative; display: block;
+  width: 28px; height: 28px; border-radius: 50%;
+  cursor: pointer;
+  border: 1.5px solid #e0e0e0;
+  background: transparent;
+  transition: all .15s;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto;
 }
-.cell:hover { transform: scale(1.2); border-color: #22c55e88; z-index: 2; }
-.cell.done { background: #22c55e; }
-.cell.done:hover { filter: brightness(1.15); }
-.cell.is-today { border-color: #ffffff20; }
-.cell.has-note::after {
-  content: ''; position: absolute; top: 2px; right: 2px;
-  width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.5);
+.cell:hover {
+  background: #e8f0fe;
+  border-color: #1a73e8;
 }
+.cell.done {
+  background: #1a73e8;
+  border-color: #1a73e8;
+}
+.cell.done::after {
+  content: '';
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #fff;
+  display: block;
+}
+.cell.done:hover { background: #1765cc; border-color: #1765cc; }
+.cell.is-today { border-color: #1a73e8; }
+.cell.has-note .note-dot {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #fbbc04;
+}
+.cell.active-cell { box-shadow: 0 0 0 3px #e8f0fe; }
 
-/* add habit */
-.add-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+/* ── ADD HABIT ── */
+.add-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 20px; padding-top: 16px;
+  border-top: 1px solid #f1f3f4;
+}
 .add-emoji {
-  width: 42px; text-align: center; font-size: 16px;
-  background: #1a1a1e; border: 1px solid #ffffff12; border-radius: 8px;
-  padding: 8px 4px; color: #e8e8e8; font-family: 'Syne', sans-serif;
-  outline: none;
-}
-.add-emoji:focus { border-color: #22c55e44; }
-.add-name {
-  flex: 1; max-width: 200px;
-  background: #1a1a1e; border: 1px solid #ffffff12; border-radius: 8px;
-  padding: 8px 12px; font-size: 13px; font-family: 'Syne', sans-serif;
-  color: #e8e8e8; outline: none;
-}
-.add-name:focus { border-color: #22c55e66; }
-.add-name::placeholder { color: #444; }
-.add-btn {
-  background: #22c55e; color: #000; border: none; border-radius: 8px;
-  padding: 8px 16px; font-size: 13px; font-family: 'Syne', sans-serif;
-  font-weight: 800; cursor: pointer; transition: opacity .15s;
-}
-.add-btn:hover { opacity: .85; }
-
-/* ── SIDE PANEL ── */
-.panel {
-  width: 0; overflow: hidden; flex-shrink: 0;
-  border-left: 1px solid transparent;
-  background: #111114;
-  transition: width .25s ease, border-color .25s;
-  display: flex; flex-direction: column;
-}
-.panel.open { width: 290px; border-left-color: #ffffff0f; }
-.panel-body { width: 290px; padding: 18px; display: flex; flex-direction: column; gap: 14px; height: 100%; }
-.panel-close {
-  background: none; border: none; color: #444; cursor: pointer;
-  font-size: 20px; line-height: 1; align-self: flex-end;
-  transition: color .15s;
-}
-.panel-close:hover { color: #e8e8e8; }
-.panel-date { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #22c55e; }
-.panel-hname { font-size: 15px; font-weight: 800; color: #e8e8e8; }
-.done-toggle {
-  display: flex; align-items: center; gap: 10px;
-  background: #1a1a1e; border: 1px solid #ffffff0f;
-  border-radius: 10px; padding: 10px 14px;
-  cursor: pointer; transition: border-color .15s;
-}
-.done-toggle:hover { border-color: #ffffff1a; }
-.check-box {
-  width: 20px; height: 20px; border-radius: 6px;
-  border: 1.5px solid #333; display: flex; align-items: center;
-  justify-content: center; transition: all .15s; flex-shrink: 0;
-}
-.check-box.done { background: #22c55e; border-color: #22c55e; }
-.check-lbl { font-size: 13px; font-weight: 700; color: #666; }
-.check-box.done + .check-lbl { color: #22c55e; }
-.note-lbl { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #444; text-transform: uppercase; letter-spacing: .08em; }
-.note-ta {
-  flex: 1; min-height: 140px; resize: none;
-  background: #1a1a1e; border: 1px solid #ffffff0f;
-  border-radius: 10px; padding: 10px 12px;
-  font-size: 13px; font-family: 'JetBrains Mono', monospace;
-  color: #ccc; outline: none; line-height: 1.6;
+  width: 44px; text-align: center; font-size: 17px;
+  background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 8px 4px; color: #202124; outline: none;
   transition: border-color .15s;
 }
-.note-ta:focus { border-color: #22c55e44; }
-.note-ta::placeholder { color: #333; }
-.save-btn {
-  background: #22c55e; color: #000; border: none; border-radius: 8px;
-  padding: 9px 18px; font-size: 13px; font-family: 'Syne', sans-serif;
-  font-weight: 800; cursor: pointer; transition: opacity .15s; align-self: flex-start;
+.add-emoji:focus { border-color: #1a73e8; }
+.add-name {
+  flex: 1; max-width: 220px;
+  background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 9px 12px; font-size: 14px;
+  font-family: 'Google Sans', sans-serif;
+  color: #202124; outline: none;
+  transition: border-color .15s;
 }
-.save-btn:hover { opacity: .85; }
-.save-ok { font-size: 11px; color: #22c55e; font-family: 'JetBrains Mono', monospace; display: none; }
+.add-name:focus { border-color: #1a73e8; background: #fff; }
+.add-name::placeholder { color: #9aa0a6; }
+.add-btn {
+  background: #1a73e8; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 9px 20px; font-size: 14px;
+  font-family: 'Google Sans', sans-serif; font-weight: 500;
+  cursor: pointer; transition: background .15s;
+}
+.add-btn:hover { background: #1765cc; }
+
+/* ── SIDE PANEL (popup style) ── */
+.panel-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 300;
+}
+.panel-overlay.open { display: block; }
+.panel-popup {
+  position: absolute;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.panel-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.panel-info { flex: 1; }
+.panel-date { font-size: 11px; font-weight: 500; color: #1a73e8; text-transform: uppercase; letter-spacing: .06em; }
+.panel-hname { font-size: 16px; font-weight: 600; color: #202124; margin-top: 3px; }
+.panel-close {
+  background: none; border: none; color: #9aa0a6;
+  cursor: pointer; font-size: 20px; line-height: 1;
+  padding: 0 0 0 8px; transition: color .15s;
+}
+.panel-close:hover { color: #3c4043; }
+.done-toggle {
+  display: flex; align-items: center; gap: 10px;
+  background: #f8f9fa; border: 1px solid #e0e0e0;
+  border-radius: 8px; padding: 10px 14px;
+  cursor: pointer; transition: all .15s;
+}
+.done-toggle:hover { background: #e8f0fe; border-color: #1a73e8; }
+.check-box {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid #dadce0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.check-box.done { background: #1a73e8; border-color: #1a73e8; }
+.check-box.done::after {
+  content: ''; width: 8px; height: 8px;
+  border-radius: 50%; background: #fff; display: block;
+}
+.check-lbl { font-size: 13px; font-weight: 500; color: #5f6368; }
+.check-box.done + .check-lbl { color: #1a73e8; }
+.note-lbl {
+  font-size: 11px; font-weight: 500; color: #9aa0a6;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.note-ta {
+  width: 100%; min-height: 100px; resize: none;
+  background: #f8f9fa; border: 1px solid #e0e0e0;
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; font-family: 'JetBrains Mono', monospace;
+  color: #202124; outline: none; line-height: 1.6;
+  transition: border-color .15s, background .15s;
+}
+.note-ta:focus { border-color: #1a73e8; background: #fff; }
+.note-ta::placeholder { color: #bdc1c6; }
+.panel-footer { display: flex; align-items: center; gap: 10px; }
+.save-btn {
+  background: #1a73e8; color: #fff;
+  border: none; border-radius: 6px;
+  padding: 8px 18px; font-size: 13px;
+  font-family: 'Google Sans', sans-serif; font-weight: 500;
+  cursor: pointer; transition: background .15s;
+}
+.save-btn:hover { background: #1765cc; }
+.save-ok { font-size: 12px; color: #34a853; display: none; }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div id="auth">
   <div class="auth-box">
     <h1>Dev<span>OS</span></h1>
-    <p>// habit tracker</p>
+    <p>Your daily habit tracker</p>
     <button class="google-btn" id="google-signin">
-      <svg width="16" height="16" viewBox="0 0 18 18">
+      <svg width="18" height="18" viewBox="0 0 18 18">
         <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
         <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
         <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
         <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/>
       </svg>
-      Continue with Google
+      Sign in with Google
     </button>
   </div>
 </div>
 
-<!-- APP SCREEN -->
+<!-- APP -->
 <div id="app">
   <div class="topbar">
-    <h1>Dev<span>OS</span></h1>
+    <div class="brand">Dev<span>OS</span></div>
     <div class="topbar-right">
       <div class="sdot" id="sdot"></div>
       <div id="uavatar"></div>
-      <button class="tbtn" id="theme-toggle">☀️</button>
-      <button class="tbtn" id="signout-btn">sign out</button>
+      <button class="tbtn" id="signout-btn">Sign out</button>
     </div>
   </div>
 
-  <div class="layout">
-    <div class="left">
-      <!-- Month nav -->
-      <div class="mnav">
-        <button class="mnav-btn" id="prev-month">‹</button>
-        <div class="mnav-title" id="mnav-title"></div>
-        <button class="mnav-btn" id="next-month">›</button>
-        <div class="today-pill" id="goto-today">today</div>
-      </div>
-
-      <!-- Calendar grid -->
-      <div class="grid-scroll">
-        <table class="grid-table" id="grid-table">
-          <thead><tr id="grid-header"></tr></thead>
-          <tbody id="grid-body"></tbody>
-        </table>
-      </div>
-
-      <!-- Add habit -->
-      <div class="add-row">
-        <input class="add-emoji" id="new-emoji" placeholder="🎯" maxlength="2" />
-        <input class="add-name" id="new-name" placeholder="Add a new goal..." />
-        <button class="add-btn" id="add-btn">+ Add</button>
-      </div>
+  <div class="main">
+    <div class="mnav">
+      <button class="mnav-btn" id="prev-month">&#8249;</button>
+      <button class="mnav-btn" id="next-month">&#8250;</button>
+      <div class="mnav-title" id="mnav-title"></div>
+      <button class="today-pill" id="goto-today">Today</button>
     </div>
 
-    <!-- Side panel -->
-    <div class="panel" id="panel">
-      <div class="panel-body">
-        <button class="panel-close" id="panel-close">×</button>
-        <div>
-          <div class="panel-date" id="panel-date"></div>
-          <div class="panel-hname" id="panel-hname"></div>
-        </div>
-        <div class="done-toggle" id="done-toggle">
-          <div class="check-box" id="check-box"></div>
-          <div class="check-lbl" id="check-lbl">Mark as done</div>
-        </div>
-        <div class="note-lbl">Notes</div>
-        <textarea class="note-ta" id="note-ta" placeholder="What did you do? Any links, snippets, thoughts..."></textarea>
-        <div style="display:flex;align-items:center;gap:12px">
-          <button class="save-btn" id="save-btn">Save</button>
-          <span class="save-ok" id="save-ok">saved ✓</span>
-        </div>
-      </div>
+    <div class="cal-wrap">
+      <table class="cal-table" id="cal-table">
+        <thead><tr id="cal-header"></tr></thead>
+        <tbody id="cal-body"></tbody>
+      </table>
+    </div>
+
+    <div class="add-row">
+      <input class="add-emoji" id="new-emoji" placeholder="🎯" maxlength="2"/>
+      <input class="add-name" id="new-name" placeholder="Add a new habit..."/>
+      <button class="add-btn" id="add-btn">Add</button>
     </div>
   </div>
 </div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
-                                from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot }
-                                from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- PANEL POPUP -->
+<div class="panel-overlay" id="panel-overlay">
+  <div class="panel-popup" id="panel-popup">
+    <div class="panel-top">
+      <div class="panel-info">
+        <div class="panel-date" id="panel-date"></div>
+        <div class="panel-hname" id="panel-hname"></div>
+      </div>
+      <button class="panel-close" id="panel-close">×</button>
+    </div>
+    <div class="done-toggle" id="done-toggle">
+      <div class="check-box" id="check-box"></div>
+      <div class="check-lbl" id="check-lbl">Mark as done</div>
+    </div>
+    <div>
+      <div class="note-lbl" style="margin-bottom:6px">Notes</div>
+      <textarea class="note-ta" id="note-ta" placeholder="What did you do? Links, thoughts, snippets..."></textarea>
+    </div>
+    <div class="panel-footer">
+      <button class="save-btn" id="save-btn">Save</button>
+      <span class="save-ok" id="save-ok">Saved ✓</span>
+    </div>
+  </div>
+</div>
 
-// ── CONFIG ──
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot }
+                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 const FB = {
   apiKey: "AIzaSyDjGmlh9HgjsbrrYQXxGPwXvjdy_B9qzRk",
   authDomain: "checkly-15539.firebaseapp.com",
@@ -327,7 +396,6 @@ const fbApp = initializeApp(FB);
 const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
 
-// ── DEFAULT HABITS ──
 const DEFAULTS = [
   { id:'dsa',     emoji:'🧠', name:'DSA Practice' },
   { id:'jobs',    emoji:'💼', name:'Job Applications' },
@@ -343,280 +411,244 @@ const DEFAULTS = [
 ];
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const WDAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WDAYS  = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
-// ── STATE ──
-let uid = null;
-let habits  = [];   // [{id, emoji, name, order}]
-let cells   = {};   // { "habitId_YYYY-MM-DD": {done, note} }
-let vYear, vMonth;  // currently viewed month
-let panel   = null; // {habitId, dk}
+let uid = null, habits = [], cells = {}, vY, vM, panel = null;
 let habitUnsub = null, cellUnsub = null;
 
-// ── HELPERS ──
 const $  = id => document.getElementById(id);
-const hCol  = () => collection(db, 'users', uid, 'habits');
-const cCol  = () => collection(db, 'users', uid, 'cells');
-const hDoc  = id => doc(db, 'users', uid, 'habits', id);
-const cDoc  = key => doc(db, 'users', uid, 'cells', key);
+const hCol = () => collection(db,'users',uid,'habits');
+const cCol = () => collection(db,'users',uid,'cells');
+const hDoc = id => doc(db,'users',uid,'habits',id);
+const cDoc = k  => doc(db,'users',uid,'cells',k);
 
-function dk(y, m, d) {
-  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-}
-function todayDk() {
-  const t = new Date();
-  return dk(t.getFullYear(), t.getMonth(), t.getDate());
-}
-function daysInMonth(y, m) { return new Date(y, m+1, 0).getDate(); }
-
-function setSync(s) {
-  const el = $('sdot');
-  el.className = 'sdot' + (s==='on'?' green' : s==='saving'?' amber' : '');
-}
+function makeDk(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function todayDk(){ const t=new Date(); return makeDk(t.getFullYear(),t.getMonth(),t.getDate()); }
+function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+function setSync(s){ $('sdot').className='sdot'+(s==='on'?' green':s==='saving'?' amber':''); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── AUTH ──
-document.getElementById('google-signin').onclick = async () => {
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-  catch(e) { console.error(e); }
+$('google-signin').onclick = async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e){ console.error(e); }
 };
-
 $('signout-btn').onclick = async () => {
-  if (habitUnsub) habitUnsub();
-  if (cellUnsub)  cellUnsub();
+  if(habitUnsub) habitUnsub(); if(cellUnsub) cellUnsub();
   await signOut(auth);
 };
 
 onAuthStateChanged(auth, async user => {
-  if (user) {
+  if(user){
     uid = user.uid;
     $('auth').style.display = 'none';
     $('app').style.display  = 'block';
-    // avatar
     $('uavatar').innerHTML = user.photoURL
       ? `<img class="uavatar" src="${user.photoURL}"/>`
       : `<div class="uavatar-text">${(user.displayName||'U')[0].toUpperCase()}</div>`;
-    // init view
-    const now = new Date();
-    vYear = now.getFullYear(); vMonth = now.getMonth();
+    const n = new Date(); vY = n.getFullYear(); vM = n.getMonth();
     await seedHabits();
     listenHabits();
     listenCells();
-    updateMonthLabel();
   } else {
     uid = null;
-    $('auth').style.display = 'flex';
-    $('app').style.display  = 'none';
+    $('auth').style.display  = 'flex';
+    $('app').style.display   = 'none';
   }
 });
 
-// ── SEED DEFAULTS ──
-async function seedHabits() {
+async function seedHabits(){
   const snap = await getDocs(hCol());
-  if (snap.empty) {
-    for (let i = 0; i < DEFAULTS.length; i++) {
+  if(snap.empty){
+    for(let i=0;i<DEFAULTS.length;i++){
       const h = DEFAULTS[i];
-      await setDoc(hDoc(h.id), { ...h, order: i });
+      await setDoc(hDoc(h.id), {...h, order:i});
     }
   }
 }
 
-// ── LISTEN HABITS ──
-function listenHabits() {
-  if (habitUnsub) habitUnsub();
+function listenHabits(){
+  if(habitUnsub) habitUnsub();
   habitUnsub = onSnapshot(hCol(), snap => {
-    habits = snap.docs
-      .map(d => d.data())
-      .sort((a,b) => (a.order||0) - (b.order||0));
+    habits = snap.docs.map(d=>d.data()).sort((a,b)=>(a.order||0)-(b.order||0));
     renderGrid();
   });
 }
 
-// ── LISTEN CELLS ──
-function listenCells() {
-  if (cellUnsub) cellUnsub();
+function listenCells(){
+  if(cellUnsub) cellUnsub();
   cellUnsub = onSnapshot(cCol(), snap => {
     cells = {};
-    snap.forEach(d => { cells[d.id] = d.data(); });
+    snap.forEach(d=>{ cells[d.id]=d.data(); });
     renderGrid();
-    if (panel) refreshPanel();
+    if(panel) refreshPanel();
     setSync('on');
   });
 }
 
-// ── RENDER GRID ──
-function updateMonthLabel() {
-  $('mnav-title').textContent = `${MONTHS[vMonth]} ${vYear}`;
-}
-
-function renderGrid() {
-  updateMonthLabel();
-  const days  = daysInMonth(vYear, vMonth);
+// ── RENDER ──
+function renderGrid(){
+  const days  = daysInMonth(vY, vM);
   const today = todayDk();
+  $('mnav-title').textContent = `${MONTHS[vM]} ${vY}`;
 
   // Header
-  const hdr = $('grid-header');
-  hdr.innerHTML = '<th class="habit-col"></th>';
-  for (let d = 1; d <= days; d++) {
-    const key   = dk(vYear, vMonth, d);
-    const dow   = new Date(vYear, vMonth, d).getDay();
-    const isT   = key === today;
-    hdr.innerHTML += `<th class="${isT?'today-hdr':''}"><span class="dow-lbl">${WDAYS[dow].slice(0,2)}</span><span class="day-num">${d}</span></th>`;
+  const hdr = $('cal-header');
+  hdr.innerHTML = '<th class="name-col"></th>';
+  for(let d=1; d<=days; d++){
+    const key = makeDk(vY, vM, d);
+    const dow = new Date(vY, vM, d).getDay();
+    const isT = key === today;
+    hdr.innerHTML += `<th class="${isT?'today-col':''}">
+      <div class="col-inner">
+        <span class="col-dow">${WDAYS[dow]}</span>
+        <span class="col-num">${d}</span>
+      </div>
+    </th>`;
   }
 
   // Body
-  const body = $('grid-body');
+  const body = $('cal-body');
   body.innerHTML = '';
   habits.forEach(h => {
     const tr = document.createElement('tr');
-    // habit label
-    const nameTd = document.createElement('td');
-    nameTd.className = 'habit-name-cell';
-    nameTd.innerHTML = `
-      <div class="habit-name-wrap">
-        <span class="h-emoji">${h.emoji||'📌'}</span>
-        <span class="h-name" title="${esc(h.name)}">${esc(h.name)}</span>
-        <button class="h-del" data-id="${h.id}" title="Remove">✕</button>
-      </div>`;
-    tr.appendChild(nameTd);
 
-    // cells
-    for (let d = 1; d <= days; d++) {
-      const key     = dk(vYear, vMonth, d);
-      const cKey    = `${h.id}_${key}`;
-      const c       = cells[cKey] || {};
-      const isDone  = !!c.done;
-      const hasNote = !!(c.note && c.note.trim());
-      const isToday = key === today;
+    // Habit name cell
+    const ntd = document.createElement('td');
+    ntd.className = 'habit-td';
+    ntd.innerHTML = `<div class="habit-wrap">
+      <span class="h-emoji">${h.emoji||'📌'}</span>
+      <span class="h-name" title="${esc(h.name)}">${esc(h.name)}</span>
+      <button class="h-del" data-id="${h.id}">✕</button>
+    </div>`;
+    tr.appendChild(ntd);
 
-      const td   = document.createElement('td');
+    // Day cells
+    for(let d=1; d<=days; d++){
+      const key  = makeDk(vY, vM, d);
+      const cKey = `${h.id}_${key}`;
+      const c    = cells[cKey] || {};
+      const done = !!c.done;
+      const note = !!(c.note && c.note.trim());
+      const isT  = key === today;
+
+      const td  = document.createElement('td');
       td.className = 'cell-td';
-      const div  = document.createElement('div');
-      div.className = ['cell', isDone?'done':'', isToday?'is-today':'', hasNote?'has-note':''].join(' ').trim();
+      const div = document.createElement('div');
+      div.className = ['cell', done?'done':'', isT?'is-today':''].join(' ').trim();
       div.dataset.habit = h.id;
       div.dataset.dk    = key;
+      if(note){ const dot=document.createElement('div'); dot.className='note-dot'; div.appendChild(dot); }
       td.appendChild(div);
       tr.appendChild(td);
     }
     body.appendChild(tr);
   });
 
-  // delegate cell clicks
+  // Event delegation
   body.onclick = e => {
     const cell = e.target.closest('.cell');
-    if (cell) { openPanel(cell.dataset.habit, cell.dataset.dk); return; }
+    if(cell){ openPanel(cell, cell.dataset.habit, cell.dataset.dk); return; }
     const del = e.target.closest('.h-del');
-    if (del) deleteHabit(del.dataset.id);
+    if(del) deleteHabit(del.dataset.id);
   };
 }
 
 // ── PANEL ──
-function openPanel(habitId, dateKey) {
-  panel = { habitId, dateKey };
-  const h   = habits.find(x => x.id === habitId);
-  const [y,m,d] = dateKey.split('-');
+function openPanel(cellEl, habitId, dk){
+  // remove active from previous
+  document.querySelectorAll('.cell.active-cell').forEach(c=>c.classList.remove('active-cell'));
+  cellEl.classList.add('active-cell');
+
+  panel = { habitId, dk };
+  const h = habits.find(x=>x.id===habitId);
+  const [y,m,d] = dk.split('-');
   const dow = WDAYS[new Date(+y,+m-1,+d).getDay()];
-  $('panel-date').textContent  = `${dow}, ${d} ${MONTHS[+m-1]} ${y}`;
+  $('panel-date').textContent  = `${dow}  ·  ${d} ${MONTHS[+m-1]} ${y}`;
   $('panel-hname').textContent = `${h?.emoji||''} ${h?.name||''}`;
   refreshPanel();
-  $('panel').classList.add('open');
+
+  // Position popup near the clicked cell
+  const rect = cellEl.getBoundingClientRect();
+  const popup = $('panel-popup');
+  const ow = 320, oh = 320;
+  let left = rect.left + rect.width/2 - ow/2;
+  let top  = rect.bottom + 8;
+  if(left + ow > window.innerWidth - 8) left = window.innerWidth - ow - 8;
+  if(left < 8) left = 8;
+  if(top + oh > window.innerHeight - 8) top = rect.top - oh - 8;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+
+  $('panel-overlay').classList.add('open');
 }
 
-function refreshPanel() {
-  if (!panel) return;
-  const c    = cells[`${panel.habitId}_${panel.dateKey}`] || {};
+function refreshPanel(){
+  if(!panel) return;
+  const c    = cells[`${panel.habitId}_${panel.dk}`] || {};
   const done = !!c.done;
   const box  = $('check-box');
-  box.className   = 'check-box' + (done?' done':'');
-  box.innerHTML   = done ? '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+  box.className = 'check-box' + (done?' done':'');
   $('check-lbl').textContent = done ? 'Done ✓' : 'Mark as done';
   $('note-ta').value = c.note || '';
   $('save-ok').style.display = 'none';
 }
 
 $('done-toggle').onclick = async () => {
-  if (!panel) return;
-  const key  = `${panel.habitId}_${panel.dateKey}`;
+  if(!panel) return;
+  const key  = `${panel.habitId}_${panel.dk}`;
   const curr = cells[key] || {};
   setSync('saving');
-  await setDoc(cDoc(key), { ...curr, done: !curr.done, habitId: panel.habitId, date: panel.dateKey }, { merge: true });
+  await setDoc(cDoc(key), {...curr, done:!curr.done, habitId:panel.habitId, date:panel.dk}, {merge:true});
 };
 
 $('save-btn').onclick = async () => {
-  if (!panel) return;
-  const key  = `${panel.habitId}_${panel.dateKey}`;
+  if(!panel) return;
+  const key  = `${panel.habitId}_${panel.dk}`;
   const curr = cells[key] || {};
-  const note = $('note-ta').value;
   setSync('saving');
-  await setDoc(cDoc(key), { ...curr, note, habitId: panel.habitId, date: panel.dateKey }, { merge: true });
+  await setDoc(cDoc(key), {...curr, note:$('note-ta').value, habitId:panel.habitId, date:panel.dk}, {merge:true});
   $('save-ok').style.display = 'inline';
-  setTimeout(() => { $('save-ok').style.display = 'none'; }, 2000);
+  setTimeout(()=>{ $('save-ok').style.display='none'; }, 2000);
 };
 
-$('panel-close').onclick = () => {
-  $('panel').classList.remove('open');
+$('panel-close').onclick = closePanel;
+$('panel-overlay').onclick = e => { if(e.target===$('panel-overlay')) closePanel(); };
+
+function closePanel(){
+  $('panel-overlay').classList.remove('open');
+  document.querySelectorAll('.cell.active-cell').forEach(c=>c.classList.remove('active-cell'));
   panel = null;
-};
-
-// ── ADD HABIT ──
-$('add-btn').onclick   = addHabit;
-$('new-name').onkeydown = e => { if (e.key === 'Enter') addHabit(); };
-
-async function addHabit() {
-  const name  = $('new-name').value.trim();
-  if (!name) return;
-  const emoji = $('new-emoji').value.trim() || '📌';
-  const id    = 'h_' + Date.now();
-  const order = habits.length;
-  setSync('saving');
-  await setDoc(hDoc(id), { id, emoji, name, order });
-  $('new-name').value  = '';
-  $('new-emoji').value = '';
 }
 
-// ── DELETE HABIT ──
-async function deleteHabit(id) {
-  if (!confirm('Remove this habit?')) return;
+// ── ADD / DELETE ──
+$('add-btn').onclick = addHabit;
+$('new-name').onkeydown = e => { if(e.key==='Enter') addHabit(); };
+
+async function addHabit(){
+  const name = $('new-name').value.trim(); if(!name) return;
+  const emoji = $('new-emoji').value.trim() || '📌';
+  const id = 'h_' + Date.now();
+  setSync('saving');
+  await setDoc(hDoc(id), {id, emoji, name, order: habits.length});
+  $('new-name').value = ''; $('new-emoji').value = '';
+}
+
+async function deleteHabit(id){
+  if(!confirm('Remove this habit?')) return;
   setSync('saving');
   await deleteDoc(hDoc(id));
 }
 
-// ── MONTH NAV ──
-$('prev-month').onclick = () => {
-  vMonth--; if (vMonth < 0) { vMonth = 11; vYear--; }
-  renderGrid();
-};
-$('next-month').onclick = () => {
-  vMonth++; if (vMonth > 11) { vMonth = 0; vYear++; }
-  renderGrid();
-};
+// ── NAV ──
+$('prev-month').onclick = () => { vM--; if(vM<0){vM=11;vY--;} renderGrid(); };
+$('next-month').onclick = () => { vM++; if(vM>11){vM=0;vY++;} renderGrid(); };
 $('goto-today').onclick = () => {
-  const t = new Date();
-  vYear = t.getFullYear(); vMonth = t.getMonth();
-  renderGrid();
-  setTimeout(() => {
-    const el = document.querySelector('.is-today');
-    if (el) el.scrollIntoView({ inline: 'center', behavior: 'smooth' });
-  }, 50);
+  const t=new Date(); vY=t.getFullYear(); vM=t.getMonth(); renderGrid();
+  setTimeout(()=>{
+    const el=document.querySelector('.is-today');
+    if(el) el.scrollIntoView({inline:'center',behavior:'smooth'});
+  },60);
 };
-
-// ── THEME ──
-$('theme-toggle').onclick = () => {
-  const body = document.body;
-  const isDark = body.style.background !== '#f5f5f3';
-  if (isDark) {
-    body.style.background = '#f5f5f3';
-    body.style.color = '#111';
-    $('theme-toggle').textContent = '🌙';
-  } else {
-    body.style.background = '#0d0d0f';
-    body.style.color = '#e8e8e8';
-    $('theme-toggle').textContent = '☀️';
-  }
-};
-
-function esc(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
 </script>
 </body>
 </html>
