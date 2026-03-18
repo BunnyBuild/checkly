@@ -3,188 +3,119 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DevOS — Developer Daily Operating System</title>
+<title>DevOS — Habit Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0b;--surface:#111113;--surface2:#18181b;--surface3:#222226;
-  --border:#ffffff0f;--border2:#ffffff18;
+  --bg:#0a0a0b;--surface:#111113;--surface2:#18181b;--surface3:#26262b;
+  --border:#ffffff0f;--border2:#ffffff1a;
   --text:#f4f4f5;--text2:#a1a1aa;--text3:#52525b;
-  --green:#22c55e;--green-dim:#14532d;--green-light:#dcfce7;
-  --amber:#f59e0b;--amber-dim:#451a03;
-  --blue:#3b82f6;--blue-dim:#1e3a5f;
+  --green:#22c55e;--green-dim:#052e16;
+  --amber:#f59e0b;
   --red:#ef4444;--red-dim:#450a0a;
-  --purple:#a855f7;--purple-dim:#3b0764;
-  --cyan:#06b6d4;--cyan-dim:#0c2a33;
-  --radius:10px;--radius-lg:16px;
+  --cell-done:#22c55e;--cell-empty:#1c1c20;
+  --panel-w:300px;
 }
 [data-theme="light"]{
-  --bg:#f8f8f7;--surface:#ffffff;--surface2:#f0f0ee;--surface3:#e8e8e5;
+  --bg:#f5f5f3;--surface:#ffffff;--surface2:#f0f0ee;--surface3:#e8e8e5;
   --border:#00000010;--border2:#00000018;
   --text:#18181b;--text2:#52525b;--text3:#a1a1aa;
-  --green-dim:#dcfce7;--green-light:#14532d;
-  --amber-dim:#fef3c7;--blue-dim:#dbeafe;
-  --red-dim:#fee2e2;--purple-dim:#f3e8ff;--cyan-dim:#cffafe;
+  --green-dim:#dcfce7;--cell-empty:#e8e8e5;
 }
-body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
-code,pre,.mono{font-family:'JetBrains Mono',monospace}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:4px}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{height:4px;width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
 /* AUTH */
 #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
-.auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:3rem 2.5rem;max-width:400px;width:100%;text-align:center}
-.auth-title{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:.25rem}
+.auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:3rem 2.5rem;max-width:380px;width:100%;text-align:center}
+.auth-title{font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:.25rem}
 .auth-title span{color:var(--green)}
-.auth-sub{font-size:13px;color:var(--text2);margin-bottom:.5rem;font-family:'JetBrains Mono',monospace}
-.auth-tagline{font-size:12px;color:var(--text3);margin-bottom:2rem;font-family:'JetBrains Mono',monospace}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);font-size:14px;font-family:'Syne',sans-serif;font-weight:600;color:var(--text);cursor:pointer;transition:background .2s,border-color .2s}
-.google-btn:hover{background:var(--surface3);border-color:var(--green)}
+.auth-sub{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:2rem}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;font-size:14px;font-family:'Syne',sans-serif;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s}
+.google-btn:hover{border-color:var(--green)}
 
-/* LAYOUT */
-#app-screen{display:none;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
-.brand{font-size:18px;font-weight:800;letter-spacing:-0.5px}
+/* APP */
+#app-screen{display:none}
+
+/* TOPBAR */
+.topbar{padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:50}
+.brand{font-size:17px;font-weight:800;letter-spacing:-.5px}
 .brand span{color:var(--green)}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--border2)}
-.avatar-fb{width:28px;height:28px;border-radius:50%;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace}
-.pill-btn{background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:5px 12px;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s}
-.pill-btn:hover{border-color:var(--border2);color:var(--text)}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3)}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:5px 12px;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s}
+.pill:hover{border-color:var(--border2);color:var(--text)}
+.pill.primary{background:var(--green);color:#000;border-color:var(--green)}
+.pill.primary:hover{opacity:.85}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background .3s}
 .sync-dot.on{background:var(--green)}
 .sync-dot.pulse{background:var(--amber);animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.avatar{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.avatar-fb{width:26px;height:26px;border-radius:50%;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace}
 
-/* NAV TABS */
-.nav-tabs{display:flex;gap:2px;padding:.75rem 1.5rem .5rem;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
-.nav-tabs::-webkit-scrollbar{display:none}
-.tab{padding:6px 14px;border-radius:50px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;white-space:nowrap;border:none;background:none;font-family:'Syne',sans-serif}
-.tab.active{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
-.tab:hover:not(.active){color:var(--text2)}
+/* MAIN LAYOUT */
+.main-wrap{display:flex;height:calc(100vh - 49px);overflow:hidden}
+.tracker-area{flex:1;overflow:auto;padding:1.25rem 1.5rem}
 
-/* CONTENT */
-.page{display:none;padding:1.5rem;max-width:760px;margin:0 auto}
-.page.active{display:block}
+/* MONTH NAV */
+.month-nav{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem}
+.month-label{font-size:16px;font-weight:800;letter-spacing:-.5px;min-width:140px}
+.nav-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:14px;transition:all .2s}
+.nav-btn:hover{border-color:var(--border2);color:var(--text)}
+.today-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px}
 
-/* DATE HEADER */
-.date-header{margin-bottom:1.5rem}
-.date-str{font-size:22px;font-weight:800;letter-spacing:-0.5px}
-.date-sub{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+/* GRID */
+.grid-wrap{min-width:max-content}
+.grid-header{display:flex;margin-bottom:4px;padding-left:180px}
+.day-hdr{width:28px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text3);flex-shrink:0}
+.day-hdr.today-col{color:var(--green);font-weight:700}
+.habit-row{display:flex;align-items:center;margin-bottom:4px}
+.habit-label{width:180px;flex-shrink:0;padding-right:12px;display:flex;align-items:center;gap:6px}
+.habit-emoji{font-size:14px;flex-shrink:0}
+.habit-name-text{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2)}
+.del-habit{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;margin-left:auto;padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .15s}
+.habit-row:hover .del-habit{opacity:1}
+.del-habit:hover{color:var(--red);background:var(--red-dim)}
+.cells{display:flex;gap:2px}
+.cell{width:26px;height:26px;border-radius:4px;background:var(--cell-empty);cursor:pointer;transition:background .15s,transform .1s;flex-shrink:0;border:1.5px solid transparent;position:relative}
+.cell:hover{transform:scale(1.15);z-index:2;border-color:var(--green)}
+.cell.done{background:var(--cell-done)}
+.cell.done:hover{filter:brightness(1.2)}
+.cell.today-col{border-color:var(--border2)}
+.cell.has-note::after{content:'';position:absolute;top:2px;right:2px;width:4px;height:4px;border-radius:50%;background:#fff6}
 
-/* FOCUS INPUT */
-.focus-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px}
-.focus-label{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;font-family:'JetBrains Mono',monospace}
-.focus-input{flex:1;background:none;border:none;outline:none;font-size:15px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif}
-.focus-input::placeholder{color:var(--text3)}
+/* ADD HABIT ROW */
+.add-habit-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-left:0}
+.add-habit-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;font-family:'Syne',sans-serif;color:var(--text);outline:none;width:160px;transition:border-color .2s}
+.add-habit-input:focus{border-color:var(--green)}
+.add-habit-input::placeholder{color:var(--text3)}
+.emoji-input{width:48px;text-align:center;font-size:16px}
 
-/* HABITS GRID */
-.habits-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
-.habit-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden}
-.habit-item:hover{border-color:var(--border2)}
-.habit-item.done{border-color:var(--green);background:linear-gradient(90deg,var(--surface) 0%,#052010 100%)}
-.habit-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
-.habit-item.done .habit-check{background:var(--green);border-color:var(--green)}
-.habit-check svg{display:none}
-.habit-item.done .habit-check svg{display:block}
-.habit-emoji{font-size:18px;flex-shrink:0}
-.habit-info{flex:1;min-width:0}
-.habit-name{font-size:14px;font-weight:600;color:var(--text)}
-.habit-item.done .habit-name{color:var(--text2)}
-.habit-desc{font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.habit-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.streak-badge{font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--amber);background:var(--amber-dim);padding:2px 8px;border-radius:50px}
-.habit-note-btn{font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
-.habit-note-btn:hover{border-color:var(--border2);color:var(--text2)}
+/* SIDE PANEL */
+.side-panel{width:0;border-left:1px solid transparent;background:var(--surface);overflow:hidden;transition:width .25s ease,border-color .25s;display:flex;flex-direction:column;flex-shrink:0}
+.side-panel.open{width:var(--panel-w);border-left-color:var(--border)}
+.panel-inner{padding:1.25rem;width:var(--panel-w);flex:1;display:flex;flex-direction:column}
+.panel-close{align-self:flex-end;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:2px;transition:color .15s}
+.panel-close:hover{color:var(--text)}
+.panel-date{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--green);margin-bottom:4px;margin-top:.5rem}
+.panel-habit{font-size:15px;font-weight:800;letter-spacing:-.3px;margin-bottom:1rem}
+.panel-toggle{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;margin-bottom:1rem;transition:border-color .2s}
+.panel-toggle:hover{border-color:var(--border2)}
+.toggle-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.toggle-check.done{background:var(--green);border-color:var(--green)}
+.toggle-label{font-size:13px;font-weight:600;color:var(--text2)}
+.panel-note-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.panel-note{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;resize:none;min-height:120px;transition:border-color .2s;line-height:1.6}
+.panel-note:focus{border-color:var(--green)}
+.panel-note::placeholder{color:var(--text3)}
+.panel-save{margin-top:.75rem;background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:opacity .2s;align-self:flex-start}
+.panel-save:hover{opacity:.85}
 
-/* NOTE EXPAND */
-.habit-note-area{display:none;padding:10px 16px 14px 52px}
-.habit-note-area.open{display:block}
-.habit-note-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;resize:none;min-height:60px;transition:border-color .2s}
-.habit-note-input:focus{border-color:var(--green)}
-
-/* PROGRESS BAR */
-.progress-wrap{margin-bottom:1.5rem}
-.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.progress-label{font-size:12px;color:var(--text2);font-weight:600}
-.progress-pct{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:700}
-.progress-bar{height:6px;background:var(--surface2);border-radius:50px;overflow:hidden}
-.progress-fill{height:100%;background:var(--green);border-radius:50px;transition:width .5s ease}
-
-/* SECTION HEADER */
-.section-hdr{display:flex;align-items:center;justify-content:space-between;margin:1.5rem 0 .75rem}
-.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-family:'JetBrains Mono',monospace}
-.section-action{font-size:12px;color:var(--green);cursor:pointer;font-weight:600;background:none;border:none;font-family:'Syne',sans-serif}
-
-/* FORMS */
-.add-row{display:flex;gap:8px;margin-bottom:1rem}
-input[type=text],select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:14px;font-family:'Syne',sans-serif;color:var(--text);outline:none;transition:border-color .2s;width:100%}
-input[type=text]::placeholder,textarea::placeholder{color:var(--text3)}
-input[type=text]:focus,select:focus,textarea:focus{border-color:var(--green)}
-select{cursor:pointer}
-select option{background:var(--surface2)}
-.btn{background:var(--green);color:#fff;border:none;border-radius:var(--radius);padding:10px 18px;font-size:13px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;white-space:nowrap}
-.btn:hover{opacity:.85}
-.btn:active{transform:scale(.97)}
-.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
-.btn-ghost:hover{opacity:1;background:var(--surface3);color:var(--text)}
-
-/* CARDS LIST */
-.cards-list{display:flex;flex-direction:column;gap:6px}
-.card-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;display:flex;align-items:center;gap:10px;animation:slideIn .2s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.card-item-body{flex:1;min-width:0}
-.card-item-title{font-size:14px;font-weight:600;color:var(--text)}
-.card-item-meta{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px}
-.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;font-family:'JetBrains Mono',monospace;white-space:nowrap}
-.badge-green{background:var(--green-dim);color:var(--green)}
-.badge-amber{background:var(--amber-dim);color:var(--amber)}
-.badge-red{background:var(--red-dim);color:var(--red)}
-.badge-blue{background:var(--blue-dim);color:var(--blue)}
-.badge-purple{background:var(--purple-dim);color:var(--purple)}
-.badge-cyan{background:var(--cyan-dim);color:var(--cyan)}
-.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px;border-radius:6px;transition:color .15s,background .15s;flex-shrink:0}
-.del-btn:hover{color:var(--red);background:var(--red-dim)}
-
-/* STATS GRID */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
-.stat-num{font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
-.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-
-/* WEEKLY GRID */
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:1rem}
-.week-day{text-align:center}
-.week-day-lbl{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
-.week-dot{width:100%;aspect-ratio:1;border-radius:4px;background:var(--surface2)}
-.week-dot.p100{background:var(--green)}
-.week-dot.p75{background:#16a34a}
-.week-dot.p50{background:#15803d}
-.week-dot.p25{background:#166534}
-.week-dot.p0{background:var(--surface2)}
-
-/* HABIT WEEK ROW */
-.habit-week-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.habit-week-name{font-size:12px;color:var(--text2);width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
-.habit-week-dots{display:flex;gap:3px;flex:1}
-.hw-dot{width:16px;height:16px;border-radius:3px;background:var(--surface2);flex-shrink:0}
-.hw-dot.done{background:var(--green)}
-
-/* EMPTY */
-.empty{text-align:center;padding:2.5rem 0;color:var(--text3);font-size:13px;font-family:'JetBrains Mono',monospace}
-
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:1rem}
-.modal-bg.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:800;margin-bottom:1.25rem}
-.form-row{margin-bottom:.75rem}
-.form-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;display:block;font-family:'JetBrains Mono',monospace}
-.modal-actions{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem 0;color:var(--text3);font-size:13px;font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
@@ -193,8 +124,7 @@ select option{background:var(--surface2)}
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-title">Dev<span>OS</span></div>
-    <div class="auth-sub">// developer daily operating system</div>
-    <div class="auth-tagline">ship every day. track everything.</div>
+    <div class="auth-sub">// habit tracker</div>
     <button class="google-btn" onclick="signInWithGoogle()">
       <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
       Continue with Google
@@ -209,116 +139,45 @@ select option{background:var(--surface2)}
     <div class="topbar-right">
       <div class="sync-dot" id="sync-dot"></div>
       <div id="user-avatar"></div>
-      <button class="pill-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
-      <button class="pill-btn" onclick="doSignOut()">sign out</button>
+      <button class="pill" onclick="toggleTheme()" id="theme-btn">☀️</button>
+      <button class="pill" onclick="doSignOut()">sign out</button>
     </div>
   </div>
 
-  <div class="nav-tabs">
-    <button class="tab active" onclick="showPage('today')">Today</button>
-    <button class="tab" onclick="showPage('leetcode')">LeetCode</button>
-    <button class="tab" onclick="showPage('jobs')">Jobs</button>
-    <button class="tab" onclick="showPage('review')">Weekly Review</button>
-  </div>
-
-  <!-- TODAY PAGE -->
-  <div class="page active" id="page-today">
-    <div class="date-header">
-      <div class="date-str" id="today-date"></div>
-      <div class="date-sub" id="today-sub"></div>
-    </div>
-
-    <div class="focus-card">
-      <div class="focus-label">⚡ Focus</div>
-      <input class="focus-input" id="focus-input" placeholder="Today's one priority..." onchange="saveFocus()" onblur="saveFocus()" />
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-top">
-        <div class="progress-label">Daily Progress</div>
-        <div class="progress-pct" id="progress-pct">0%</div>
+  <div class="main-wrap">
+    <div class="tracker-area">
+      <div class="month-nav">
+        <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="month-label" id="month-label"></div>
+        <button class="nav-btn" onclick="changeMonth(1)">›</button>
+        <button class="nav-btn today-btn pill" onclick="goToday()">today</button>
       </div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+      <div class="grid-wrap" id="grid-wrap">
+        <div class="empty-state">loading...</div>
+      </div>
+
+      <div class="add-habit-row">
+        <input class="add-habit-input emoji-input" id="new-emoji" placeholder="🎯" maxlength="2" />
+        <input class="add-habit-input" id="new-name" placeholder="Add a new goal..." />
+        <button class="pill primary" onclick="addHabit()">+ Add</button>
+      </div>
     </div>
 
-    <div class="habits-grid" id="habits-grid"></div>
-  </div>
-
-  <!-- LEETCODE PAGE -->
-  <div class="page" id="page-leetcode">
-    <div class="section-hdr" style="margin-top:0">
-      <div class="section-title">LeetCode Log</div>
-      <button class="section-action" onclick="openModal('lc-modal')">+ Add</button>
-    </div>
-    <div class="stats-grid" id="lc-stats"></div>
-    <div class="cards-list" id="lc-list"></div>
-  </div>
-
-  <!-- JOBS PAGE -->
-  <div class="page" id="page-jobs">
-    <div class="section-hdr" style="margin-top:0">
-      <div class="section-title">Job Applications</div>
-      <button class="section-action" onclick="openModal('job-modal')">+ Add</button>
-    </div>
-    <div class="stats-grid" id="job-stats"></div>
-    <div class="cards-list" id="job-list"></div>
-  </div>
-
-  <!-- WEEKLY REVIEW -->
-  <div class="page" id="page-review">
-    <div class="section-hdr" style="margin-top:0">
-      <div class="section-title">Last 7 Days</div>
-    </div>
-    <div id="week-habit-grid"></div>
-    <div class="section-hdr">
-      <div class="section-title">Stats</div>
-    </div>
-    <div class="stats-grid" id="review-stats"></div>
-  </div>
-</div>
-
-<!-- LEETCODE MODAL -->
-<div class="modal-bg" id="lc-modal">
-  <div class="modal">
-    <div class="modal-title">Log LeetCode Problem</div>
-    <div class="form-row"><label class="form-label">Problem Name</label><input type="text" id="lc-name" placeholder="Two Sum" /></div>
-    <div class="form-row"><label class="form-label">Difficulty</label>
-      <select id="lc-diff"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option></select>
-    </div>
-    <div class="form-row"><label class="form-label">Status</label>
-      <select id="lc-status"><option value="Solved">Solved ✓</option><option value="Attempted">Attempted</option><option value="Need Review">Need Review</option></select>
-    </div>
-    <div class="form-row"><label class="form-label">Notes (optional)</label><input type="text" id="lc-notes" placeholder="DP approach, O(n) space..." /></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('lc-modal')">Cancel</button>
-      <button class="btn" onclick="addLC()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- JOB MODAL -->
-<div class="modal-bg" id="job-modal">
-  <div class="modal">
-    <div class="modal-title">Log Job Application</div>
-    <div class="form-row"><label class="form-label">Company</label><input type="text" id="job-company" placeholder="Google, Juspay..." /></div>
-    <div class="form-row"><label class="form-label">Role</label><input type="text" id="job-role" placeholder="SDE1, Backend Engineer..." /></div>
-    <div class="form-row"><label class="form-label">Platform</label>
-      <select id="job-platform">
-        <option>LinkedIn</option><option>Naukri</option><option>Instahyre</option>
-        <option>Wellfound</option><option>Indeed</option><option>Company Website</option>
-        <option>Referral</option><option>Other</option>
-      </select>
-    </div>
-    <div class="form-row"><label class="form-label">Status</label>
-      <select id="job-status">
-        <option value="Applied">Applied</option><option value="OA">Online Assessment</option>
-        <option value="Interview">Interview</option><option value="Offer">Offer 🎉</option>
-        <option value="Rejected">Rejected</option><option value="No Response">No Response</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('job-modal')">Cancel</button>
-      <button class="btn" onclick="addJob()">Save</button>
+    <!-- SIDE PANEL -->
+    <div class="side-panel" id="side-panel">
+      <div class="panel-inner">
+        <button class="panel-close" onclick="closePanel()">×</button>
+        <div class="panel-date" id="panel-date"></div>
+        <div class="panel-habit" id="panel-habit"></div>
+        <div class="panel-toggle" onclick="togglePanelCell()">
+          <div class="toggle-check" id="panel-check"></div>
+          <div class="toggle-label" id="panel-toggle-label">Mark as done</div>
+        </div>
+        <div class="panel-note-label">Notes</div>
+        <textarea class="panel-note" id="panel-note" placeholder="What did you do today? Any thoughts, links, or snippets..."></textarea>
+        <button class="panel-save" onclick="savePanel()">Save</button>
+      </div>
     </div>
   </div>
 </div>
@@ -326,7 +185,7 @@ select option{background:var(--surface2)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjGmlh9HgjsbrrYQXxGPwXvjdy_B9qzRk",
@@ -340,40 +199,56 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const gProvider = new GoogleAuthProvider();
+const gp = new GoogleAuthProvider();
 
-const HABITS = [
-  {id:'dsa',    emoji:'🧠', name:'DSA Practice',         desc:'LeetCode Medium/Hard — min 1 problem'},
-  {id:'jobs',   emoji:'💼', name:'Job Applications',      desc:'Apply on LinkedIn, Naukri, Instahyre...'},
-  {id:'gym',    emoji:'💪', name:'Exercise',              desc:'Push / Pull / Legs — stay consistent'},
-  {id:'learn',  emoji:'📖', name:'Learn One Concept',     desc:'One topic, your own notes + snippet'},
-  {id:'career', emoji:'🚀', name:'Career Signal',         desc:'GitHub, resume, post, recruiter outreach'},
-  {id:'work',   emoji:'⚙️', name:'Deep Work',             desc:'Ship something measurable at SAP'},
-  {id:'read',   emoji:'📰', name:'Read Tech Article',     desc:'15–20 min: blogs, architecture, OSS code'},
-  {id:'finance',emoji:'💰', name:'Finance Learning',      desc:'Investing, markets, financial literacy'},
-  {id:'side',   emoji:'🛠️', name:'Side Project',          desc:'Add/improve one feature — build proof'},
-  {id:'ai',     emoji:'🤖', name:'AI Tool Practice',      desc:'Use one AI tool — save 30min of work'},
-  {id:'health', emoji:'🥗', name:'Gym / Food / Diet',     desc:'Nutrition, sleep, recovery'}
+const DEFAULT_HABITS = [
+  {id:'dsa',    emoji:'🧠', name:'DSA Practice'},
+  {id:'jobs',   emoji:'💼', name:'Job Applications'},
+  {id:'gym',    emoji:'💪', name:'Exercise'},
+  {id:'learn',  emoji:'📖', name:'Learn One Concept'},
+  {id:'career', emoji:'🚀', name:'Career Signal'},
+  {id:'work',   emoji:'⚙️', name:'Deep Work'},
+  {id:'read',   emoji:'📰', name:'Read Tech Article'},
+  {id:'finance',emoji:'💰', name:'Finance Learning'},
+  {id:'side',   emoji:'🛠️', name:'Side Project'},
+  {id:'ai',     emoji:'🤖', name:'AI Tool Practice'},
+  {id:'health', emoji:'🥗', name:'Gym / Food / Diet'}
 ];
 
-let currentUser = null, todayData = {}, lcList = [], jobList = [], historyData = {}, unsubs = [];
+let currentUser = null;
+let habits = [];
+let cellData = {}; // key: "habitId_YYYY-MM-DD" => {done, note}
+let viewYear, viewMonth;
+let panelState = null; // {habitId, dateKey}
+let unsubs = [];
 
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WDAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
 function sync(s) {
-  const dot = document.getElementById('sync-dot');
-  dot.className = 'sync-dot' + (s==='on'?' on':s==='pulse'?' pulse':'');
+  const d = document.getElementById('sync-dot');
+  d.className = 'sync-dot' + (s==='on'?' on':s==='pulse'?' pulse':'');
+}
+
+function dateKey(y,m,d) {
+  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function todayKey() {
+  const n = new Date();
+  return dateKey(n.getFullYear(), n.getMonth(), n.getDate());
+}
+
+function uRef(...parts) {
+  return ['users', currentUser.uid, ...parts];
 }
 
 window.signInWithGoogle = async () => {
-  try { await signInWithPopup(auth, gProvider); } catch(e) { console.error(e); }
+  try { await signInWithPopup(auth, gp); } catch(e) { console.error(e); }
 };
 
 window.doSignOut = async () => {
-  unsubs.forEach(u => u());
+  unsubs.forEach(u=>u()); unsubs=[];
   await signOut(auth);
 };
 
@@ -384,12 +259,12 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('app-screen').style.display = 'block';
     const av = document.getElementById('user-avatar');
     av.innerHTML = user.photoURL
-      ? `<img class="avatar" src="${user.photoURL}" />`
-      : `<div class="avatar-fb">${(user.displayName||user.email||'U')[0].toUpperCase()}</div>`;
-    initToday();
-    initLC();
-    initJobs();
-    renderDateHeader();
+      ? `<img class="avatar" src="${user.photoURL}"/>`
+      : `<div class="avatar-fb">${(user.displayName||'U')[0].toUpperCase()}</div>`;
+    const now = new Date();
+    viewYear = now.getFullYear(); viewMonth = now.getMonth();
+    await initHabits();
+    initCells();
   } else {
     currentUser = null;
     document.getElementById('auth-screen').style.display = 'flex';
@@ -397,282 +272,191 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-function uPath(...parts) { return ['users', currentUser.uid, ...parts].join('/'); }
-
-// ── TODAY ──
-async function initToday() {
-  const key = todayKey();
-  const ref = doc(db, uPath('days', key));
-  const snap = await getDoc(ref);
-  todayData = snap.exists() ? snap.data() : { habits:{}, focus:'', notes:{} };
-  // load focus
-  document.getElementById('focus-input').value = todayData.focus || '';
-  renderHabits();
-  sync('on');
-  // load history for streaks
-  await loadHistory();
+async function initHabits() {
+  // load or seed habits
+  const habitsCol = collection(db, ...uRef('habits'));
+  const q = query(habitsCol, orderBy('order','asc'));
+  return new Promise(resolve => {
+    const unsub = onSnapshot(q, snap => {
+      if (snap.empty && habits.length === 0) {
+        // seed defaults
+        DEFAULT_HABITS.forEach((h,i) => {
+          setDoc(doc(db, ...uRef('habits', h.id)), {...h, order:i});
+        });
+      } else {
+        habits = snap.docs.map(d=>d.data()).sort((a,b)=>a.order-b.order);
+        renderGrid();
+      }
+      resolve();
+    });
+    unsubs.push(unsub);
+  });
 }
 
-async function loadHistory() {
-  const col = collection(db, uPath('days'));
-  const snap = await getDocs(col);
-  historyData = {};
-  snap.forEach(d => { historyData[d.id] = d.data(); });
-  renderHabits();
-  renderWeekly();
-}
-
-async function saveToday() {
-  sync('pulse');
-  const key = todayKey();
-  await setDoc(doc(db, uPath('days', key)), todayData, {merge:true});
-  historyData[key] = todayData;
-  sync('on');
-}
-
-window.saveFocus = async () => {
-  todayData.focus = document.getElementById('focus-input').value;
-  await saveToday();
-};
-
-window.toggleHabit = async (id) => {
-  if (!todayData.habits) todayData.habits = {};
-  todayData.habits[id] = !todayData.habits[id];
-  await saveToday();
-  renderHabits();
-  renderWeekly();
-};
-
-window.toggleNote = (id) => {
-  const el = document.getElementById('note-area-'+id);
-  el.classList.toggle('open');
-};
-
-window.saveNote = async (id) => {
-  if (!todayData.notes) todayData.notes = {};
-  todayData.notes[id] = document.getElementById('note-'+id).value;
-  await saveToday();
-};
-
-function getStreak(habitId) {
-  let streak = 0;
-  const today = new Date();
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    if (historyData[key]?.habits?.[habitId]) streak++;
-    else if (i > 0) break;
-  }
-  return streak;
-}
-
-function renderHabits() {
-  const done = HABITS.filter(h => todayData.habits?.[h.id]).length;
-  const pct = Math.round((done / HABITS.length) * 100);
-  document.getElementById('progress-pct').textContent = pct + '%';
-  document.getElementById('progress-fill').style.width = pct + '%';
-
-  document.getElementById('habits-grid').innerHTML = HABITS.map(h => {
-    const isDone = !!todayData.habits?.[h.id];
-    const streak = getStreak(h.id);
-    const note = todayData.notes?.[h.id] || '';
-    return `
-      <div>
-        <div class="habit-item ${isDone?'done':''}" onclick="toggleHabit('${h.id}')">
-          <div class="habit-check">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="habit-emoji">${h.emoji}</div>
-          <div class="habit-info">
-            <div class="habit-name">${h.name}</div>
-            <div class="habit-desc">${h.desc}</div>
-          </div>
-          <div class="habit-right">
-            ${streak > 1 ? `<div class="streak-badge">🔥${streak}</div>` : ''}
-            <button class="habit-note-btn" onclick="event.stopPropagation();toggleNote('${h.id}')">note</button>
-          </div>
-        </div>
-        <div class="habit-note-area ${note?'open':''}" id="note-area-${h.id}">
-          <textarea class="habit-note-input" id="note-${h.id}" placeholder="Add a note for today..." onblur="saveNote('${h.id}')">${note}</textarea>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function renderDateHeader() {
-  const d = new Date();
-  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('today-date').textContent = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-  const key = todayKey();
-  document.getElementById('today-sub').textContent = `// ${key} — day ${Math.ceil((d - new Date(d.getFullYear(),0,1)) / 86400000)} of ${d.getFullYear()}`;
-}
-
-// ── LEETCODE ──
-function initLC() {
-  const col = collection(db, uPath('leetcode'));
-  const q = query(col, orderBy('createdAt','desc'));
-  const unsub = onSnapshot(q, snap => {
-    lcList = snap.docs.map(d => ({id:d.id,...d.data()}));
-    renderLC();
+function initCells() {
+  // listen to all cell data for current user
+  const cellsCol = collection(db, ...uRef('cells'));
+  const unsub = onSnapshot(cellsCol, snap => {
+    cellData = {};
+    snap.forEach(d => { cellData[d.id] = d.data(); });
+    renderGrid();
+    if (panelState) refreshPanel();
     sync('on');
   });
   unsubs.push(unsub);
 }
 
-window.addLC = async () => {
-  const name = document.getElementById('lc-name').value.trim();
+function daysInMonth(y,m) { return new Date(y, m+1, 0).getDate(); }
+
+function renderGrid() {
+  const days = daysInMonth(viewYear, viewMonth);
+  const tk = todayKey();
+  document.getElementById('month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+  let html = '<div class="grid-header">';
+  for (let d=1; d<=days; d++) {
+    const k = dateKey(viewYear, viewMonth, d);
+    const dow = new Date(viewYear, viewMonth, d).getDay();
+    const isToday = k === tk;
+    html += `<div class="day-hdr ${isToday?'today-col':''}">${d}</div>`;
+  }
+  html += '</div>';
+
+  if (!habits.length) {
+    html += '<div class="empty-state">add your first goal below ↓</div>';
+  } else {
+    habits.forEach(h => {
+      html += `<div class="habit-row">
+        <div class="habit-label">
+          <span class="habit-emoji">${h.emoji||'📌'}</span>
+          <span class="habit-name-text" title="${escHtml(h.name)}">${escHtml(h.name)}</span>
+          <button class="del-habit" onclick="deleteHabit('${h.id}')" title="Remove">✕</button>
+        </div>
+        <div class="cells">`;
+      for (let d=1; d<=days; d++) {
+        const k = dateKey(viewYear, viewMonth, d);
+        const cellKey = `${h.id}_${k}`;
+        const cell = cellData[cellKey] || {};
+        const done = !!cell.done;
+        const hasNote = !!(cell.note && cell.note.trim());
+        const isToday = k === tk;
+        html += `<div class="cell ${done?'done':''} ${isToday?'today-col':''} ${hasNote?'has-note':''}"
+          onmouseenter="hoverCell('${h.id}','${k}',this)"
+          onclick="clickCell('${h.id}','${k}')">
+        </div>`;
+      }
+      html += '</div></div>';
+    });
+  }
+
+  document.getElementById('grid-wrap').innerHTML = html;
+}
+
+window.hoverCell = (habitId, dateKey, el) => {
+  openPanel(habitId, dateKey);
+};
+
+window.clickCell = (habitId, dk) => {
+  openPanel(habitId, dk);
+  toggleCellDone(habitId, dk);
+};
+
+function openPanel(habitId, dk) {
+  panelState = {habitId, dk};
+  const habit = habits.find(h=>h.id===habitId);
+  if (!habit) return;
+  const [y,m,d] = dk.split('-');
+  const dateObj = new Date(+y, +m-1, +d);
+  const dow = WDAYS[dateObj.getDay()];
+  document.getElementById('panel-date').textContent = `${dow}, ${d} ${MONTHS[+m-1]} ${y}`;
+  document.getElementById('panel-habit').textContent = `${habit.emoji||''} ${habit.name}`;
+  refreshPanel();
+  document.getElementById('side-panel').classList.add('open');
+}
+
+function refreshPanel() {
+  if (!panelState) return;
+  const {habitId, dk} = panelState;
+  const cellKey = `${habitId}_${dk}`;
+  const cell = cellData[cellKey] || {};
+  const done = !!cell.done;
+  const chk = document.getElementById('panel-check');
+  if (chk) {
+    chk.className = 'toggle-check' + (done?' done':'');
+    chk.innerHTML = done ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+    document.getElementById('panel-toggle-label').textContent = done ? 'Done ✓' : 'Mark as done';
+  }
+  const noteEl = document.getElementById('panel-note');
+  if (noteEl) noteEl.value = cell.note || '';
+}
+
+window.togglePanelCell = () => {
+  if (!panelState) return;
+  toggleCellDone(panelState.habitId, panelState.dk);
+};
+
+async function toggleCellDone(habitId, dk) {
+  const cellKey = `${habitId}_${dk}`;
+  const curr = cellData[cellKey] || {};
+  const newDone = !curr.done;
+  sync('pulse');
+  await setDoc(doc(db, ...uRef('cells', cellKey)), {
+    ...curr, done: newDone, habitId, date: dk
+  }, {merge:true});
+}
+
+window.savePanel = async () => {
+  if (!panelState) return;
+  const {habitId, dk} = panelState;
+  const cellKey = `${habitId}_${dk}`;
+  const curr = cellData[cellKey] || {};
+  const note = document.getElementById('panel-note').value;
+  sync('pulse');
+  await setDoc(doc(db, ...uRef('cells', cellKey)), {
+    ...curr, note, habitId, date: dk
+  }, {merge:true});
+};
+
+window.closePanel = () => {
+  document.getElementById('side-panel').classList.remove('open');
+  panelState = null;
+};
+
+window.addHabit = async () => {
+  const name = document.getElementById('new-name').value.trim();
   if (!name) return;
+  const emoji = document.getElementById('new-emoji').value.trim() || '📌';
+  const id = 'h_' + Date.now();
+  const order = habits.length;
   sync('pulse');
-  await addDoc(collection(db, uPath('leetcode')), {
-    name, diff: document.getElementById('lc-diff').value,
-    status: document.getElementById('lc-status').value,
-    notes: document.getElementById('lc-notes').value.trim(),
-    createdAt: Date.now(), date: todayKey()
-  });
-  document.getElementById('lc-name').value = '';
-  document.getElementById('lc-notes').value = '';
-  closeModal('lc-modal');
+  await setDoc(doc(db, ...uRef('habits', id)), {id, emoji, name, order});
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-emoji').value = '';
 };
 
-window.deleteLC = async (id) => {
-  await deleteDoc(doc(db, uPath('leetcode', id)));
-};
-
-function renderLC() {
-  const total = lcList.length;
-  const solved = lcList.filter(p=>p.status==='Solved').length;
-  const hard = lcList.filter(p=>p.diff==='Hard').length;
-  const medium = lcList.filter(p=>p.diff==='Medium').length;
-  const easy = lcList.filter(p=>p.diff==='Easy').length;
-  document.getElementById('lc-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${solved}</div><div class="stat-lbl">Solved</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${hard}</div><div class="stat-lbl">Hard</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--amber)">${medium}</div><div class="stat-lbl">Medium</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${easy}</div><div class="stat-lbl">Easy</div></div>`;
-
-  const diffBadge = {Easy:'badge-green',Medium:'badge-amber',Hard:'badge-red'};
-  const statusBadge = {Solved:'badge-green',Attempted:'badge-amber','Need Review':'badge-purple','No Response':'badge-cyan'};
-  document.getElementById('lc-list').innerHTML = lcList.length ? lcList.map(p => `
-    <div class="card-item">
-      <div class="card-item-body">
-        <div class="card-item-title">${escHtml(p.name)}</div>
-        <div class="card-item-meta">${p.date}${p.notes?' — '+escHtml(p.notes):''}</div>
-      </div>
-      <span class="badge ${diffBadge[p.diff]||'badge-cyan'}">${p.diff}</span>
-      <span class="badge ${statusBadge[p.status]||'badge-cyan'}">${p.status}</span>
-      <button class="del-btn" onclick="deleteLC('${p.id}')">✕</button>
-    </div>`).join('') : '<div class="empty">no problems logged yet</div>';
-}
-
-// ── JOBS ──
-function initJobs() {
-  const col = collection(db, uPath('jobs'));
-  const q = query(col, orderBy('createdAt','desc'));
-  const unsub = onSnapshot(q, snap => {
-    jobList = snap.docs.map(d => ({id:d.id,...d.data()}));
-    renderJobs();
-    sync('on');
-  });
-  unsubs.push(unsub);
-}
-
-window.addJob = async () => {
-  const company = document.getElementById('job-company').value.trim();
-  if (!company) return;
+window.deleteHabit = async (id) => {
+  if (!confirm('Remove this habit?')) return;
   sync('pulse');
-  await addDoc(collection(db, uPath('jobs')), {
-    company, role: document.getElementById('job-role').value.trim(),
-    platform: document.getElementById('job-platform').value,
-    status: document.getElementById('job-status').value,
-    createdAt: Date.now(), date: todayKey()
-  });
-  document.getElementById('job-company').value = '';
-  document.getElementById('job-role').value = '';
-  closeModal('job-modal');
+  await deleteDoc(doc(db, ...uRef('habits', id)));
 };
 
-window.deleteJob = async (id) => {
-  await deleteDoc(doc(db, uPath('jobs', id)));
+window.changeMonth = (dir) => {
+  viewMonth += dir;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderGrid();
 };
 
-function renderJobs() {
-  const total = jobList.length;
-  const interviews = jobList.filter(j=>j.status==='Interview').length;
-  const offers = jobList.filter(j=>j.status==='Offer').length;
-  const rejected = jobList.filter(j=>j.status==='Rejected').length;
-  document.getElementById('job-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${total}</div><div class="stat-lbl">Applied</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--amber)">${interviews}</div><div class="stat-lbl">Interviews</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${offers}</div><div class="stat-lbl">Offers</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${rejected}</div><div class="stat-lbl">Rejected</div></div>`;
-
-  const statusBadge = {Applied:'badge-blue',OA:'badge-amber',Interview:'badge-purple',Offer:'badge-green',Rejected:'badge-red','No Response':'badge-cyan'};
-  const platformBadge = {LinkedIn:'badge-blue',Naukri:'badge-amber',Instahyre:'badge-green',Wellfound:'badge-purple',Indeed:'badge-cyan'};
-  document.getElementById('job-list').innerHTML = jobList.length ? jobList.map(j => `
-    <div class="card-item">
-      <div class="card-item-body">
-        <div class="card-item-title">${escHtml(j.company)}${j.role?' — '+escHtml(j.role):''}</div>
-        <div class="card-item-meta">${j.date}</div>
-      </div>
-      <span class="badge ${platformBadge[j.platform]||'badge-cyan'}">${j.platform}</span>
-      <span class="badge ${statusBadge[j.status]||'badge-cyan'}">${j.status}</span>
-      <button class="del-btn" onclick="deleteJob('${j.id}')">✕</button>
-    </div>`).join('') : '<div class="empty">no applications logged yet</div>';
-}
-
-// ── WEEKLY REVIEW ──
-function renderWeekly() {
-  const days7 = [];
-  for (let i=6; i>=0; i--) {
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const lbl = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
-    days7.push({key, lbl});
-  }
-
-  // habit rows
-  let html = '';
-  HABITS.forEach(h => {
-    const dots = days7.map(d => {
-      const done = historyData[d.key]?.habits?.[h.id];
-      return `<div class="hw-dot ${done?'done':''}" title="${d.lbl}"></div>`;
-    }).join('');
-    html += `<div class="habit-week-row">
-      <div class="habit-week-name">${h.emoji} ${h.name}</div>
-      <div class="habit-week-dots">${dots}</div>
-    </div>`;
-  });
-  document.getElementById('week-habit-grid').innerHTML = html;
-
-  // stats
-  const totalDays = days7.filter(d => historyData[d.key]).length;
-  const totalChecks = days7.reduce((sum,d) => sum + Object.values(historyData[d.key]?.habits||{}).filter(Boolean).length, 0);
-  const lcWeek = lcList.filter(p => days7.some(d=>d.key===p.date)).length;
-  const jobsWeek = jobList.filter(j => days7.some(d=>d.key===j.date)).length;
-  const avgPct = totalDays ? Math.round(totalChecks / (totalDays * HABITS.length) * 100) : 0;
-  document.getElementById('review-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${avgPct}%</div><div class="stat-lbl">Avg Completion</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--amber)">${totalChecks}</div><div class="stat-lbl">Habits Done</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${lcWeek}</div><div class="stat-lbl">LC Problems</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--purple)">${jobsWeek}</div><div class="stat-lbl">Jobs Applied</div></div>`;
-}
-
-// ── UTILS ──
-window.showPage = (name) => {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  event.target.classList.add('active');
-  if (name==='review') { renderWeekly(); }
+window.goToday = () => {
+  const n = new Date();
+  viewYear = n.getFullYear(); viewMonth = n.getMonth();
+  renderGrid();
+  // scroll to today
+  setTimeout(() => {
+    const todayCols = document.querySelectorAll('.today-col');
+    if (todayCols.length) todayCols[0].scrollIntoView({inline:'center', behavior:'smooth'});
+  }, 50);
 };
-
-window.openModal = (id) => document.getElementById(id).classList.add('open');
-window.closeModal = (id) => document.getElementById(id).classList.remove('open');
-
-document.querySelectorAll('.modal-bg').forEach(m => {
-  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
-});
 
 window.toggleTheme = () => {
   const isDark = document.documentElement.getAttribute('data-theme')==='dark';
@@ -686,8 +470,12 @@ if (localStorage.getItem('devos-theme')==='light') {
   document.getElementById('theme-btn').textContent = '🌙';
 }
 
-function escHtml(str) {
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+document.getElementById('new-name').addEventListener('keydown', e => {
+  if (e.key==='Enter') window.addHabit();
+});
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 </body>
