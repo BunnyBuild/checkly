@@ -393,9 +393,9 @@ body {
       <button class="panel-close" id="panel-close">×</button>
     </div>
     <div style="display:flex;gap:6px;" id="status-btns">
-      <button class="sbtn sbtn-red"   data-s="red"    onclick="setPanelStatus('red')">🔴 Not done</button>
-      <button class="sbtn sbtn-yellow" data-s="yellow" onclick="setPanelStatus('yellow')">🟡 In progress</button>
-      <button class="sbtn sbtn-green" data-s="green"  onclick="setPanelStatus('green')">🟢 Done</button>
+      <button class="sbtn" data-s="red">🔴 Not done</button>
+      <button class="sbtn" data-s="yellow">🟡 In progress</button>
+      <button class="sbtn" data-s="green">🟢 Done</button>
     </div>
     <div>
       <div class="note-lbl" style="margin-bottom:6px">Notes</div>
@@ -681,15 +681,7 @@ $('done-toggle').onclick = async () => {
   await setDoc(cDoc(key), {...curr, done:!curr.done, habitId:panel.habitId, date:panel.dk}, {merge:true});
 };
 
-$('save-btn').onclick = async () => {
-  if(!panel) return;
-  const key  = `${panel.habitId}_${panel.dk}`;
-  const curr = cells[key] || {};
-  setSync('saving');
-  await setDoc(cDoc(key), {...curr, note:$('note-ta').value, habitId:panel.habitId, date:panel.dk}, {merge:true});
-  $('save-ok').style.display = 'inline';
-  setTimeout(()=>{ closePanel(); }, 800);
-};
+
 
 function closeAllMenus(){
   document.querySelectorAll('.cell-menu.visible').forEach(m => m.classList.remove('visible'));
@@ -706,18 +698,34 @@ window.quickStatus = async (habitId, dk, status) => {
 
 
 
-window.setPanelStatus = async (status) => {
-  if(!panel) return;
+
+
+$('panel-close').onclick = closePanel;
+
+// Status button delegation
+$('status-btns').addEventListener('click', async e => {
+  const btn = e.target.closest('.sbtn');
+  if(!btn || !panel) return;
+  const status = btn.dataset.s;
   const key  = panel.habitId + '_' + panel.dk;
   const curr = cells[key] || {};
   setSync('saving');
   await setDoc(cDoc(key), {...curr, status, done: status==='green', habitId:panel.habitId, date:panel.dk}, {merge:true});
-  document.querySelectorAll('.sbtn').forEach(b => {
+  document.querySelectorAll('#status-btns .sbtn').forEach(b => {
     b.className = 'sbtn' + (b.dataset.s===status ? ' active-'+status : '');
   });
-};
+});
 
-$('panel-close').onclick = closePanel;
+// Save button
+$('save-btn').addEventListener('click', async () => {
+  if(!panel) return;
+  const key  = panel.habitId + '_' + panel.dk;
+  const curr = cells[key] || {};
+  setSync('saving');
+  await setDoc(cDoc(key), {...curr, note:$('note-ta').value, habitId:panel.habitId, date:panel.dk}, {merge:true});
+  $('save-ok').style.display = 'inline';
+  setTimeout(()=>{ closePanel(); }, 800);
+});
 $('panel-overlay').onclick = e => { if(e.target===$('panel-overlay')) closePanel(); };
 
 function closePanel(){
