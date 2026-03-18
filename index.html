@@ -273,24 +273,23 @@ onAuthStateChanged(auth, async user => {
 });
 
 async function initHabits() {
-  // load or seed habits
   const habitsCol = collection(db, ...uRef('habits'));
   const q = query(habitsCol, orderBy('order','asc'));
-  return new Promise(resolve => {
-    const unsub = onSnapshot(q, snap => {
-      if (snap.empty && habits.length === 0) {
-        // seed defaults
-        DEFAULT_HABITS.forEach((h,i) => {
-          setDoc(doc(db, ...uRef('habits', h.id)), {...h, order:i});
-        });
-      } else {
-        habits = snap.docs.map(d=>d.data()).sort((a,b)=>a.order-b.order);
-        renderGrid();
-      }
-      resolve();
-    });
-    unsubs.push(unsub);
+
+  // First check if empty, seed if needed
+  const initialSnap = await getDocs(q);
+  if (initialSnap.empty) {
+    await Promise.all(DEFAULT_HABITS.map((h,i) =>
+      setDoc(doc(db, ...uRef('habits', h.id)), {...h, order:i})
+    ));
+  }
+
+  // Now listen for realtime updates
+  const unsub = onSnapshot(q, snap => {
+    habits = snap.docs.map(d=>d.data()).sort((a,b)=>a.order-b.order);
+    renderGrid();
   });
+  unsubs.push(unsub);
 }
 
 function initCells() {
@@ -341,7 +340,6 @@ function renderGrid() {
         const hasNote = !!(cell.note && cell.note.trim());
         const isToday = k === tk;
         html += `<div class="cell ${done?'done':''} ${isToday?'today-col':''} ${hasNote?'has-note':''}"
-          onmouseenter="hoverCell('${h.id}','${k}',this)"
           onclick="clickCell('${h.id}','${k}')">
         </div>`;
       }
@@ -358,7 +356,6 @@ window.hoverCell = (habitId, dateKey, el) => {
 
 window.clickCell = (habitId, dk) => {
   openPanel(habitId, dk);
-  toggleCellDone(habitId, dk);
 };
 
 function openPanel(habitId, dk) {
