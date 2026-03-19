@@ -60,6 +60,9 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .h-del{background:none;border:none;color:#dadce0;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0;transition:all .15s;flex-shrink:0}
 .cal-table tbody tr:hover .h-del{opacity:1}
 .h-del:hover{color:#d93025;background:#fce8e6}
+.h-edit{background:none;border:none;color:#dadce0;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0;transition:all .15s;flex-shrink:0}
+.cal-table tbody tr:hover .h-edit{opacity:1}
+.h-edit:hover{color:#1a73e8;background:#e8f0fe}
 
 /* CELLS */
 .cell-td{padding:4px !important;text-align:center}
@@ -159,6 +162,24 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
       <input class="add-emoji" id="inp-emoji" placeholder="🎯" maxlength="2"/>
       <input class="add-name"  id="inp-name"  placeholder="Add a new habit..."/>
       <button class="add-btn"  id="btn-add">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-overlay" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.3);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:22px;width:320px;box-shadow:0 8px 30px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:15px;font-weight:700;color:#202124">Edit Habit</div>
+      <button id="edit-close" style="background:none;border:none;font-size:22px;color:#9aa0a6;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <input id="edit-emoji" maxlength="2" style="width:48px;text-align:center;font-size:17px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:8px 4px;outline:none"/>
+      <input id="edit-name" style="flex:1;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Google Sans',sans-serif;color:#202124;outline:none"/>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="edit-cancel" style="border:1px solid #dadce0;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:500;color:#3c4043;background:#fff;cursor:pointer">Cancel</button>
+      <button id="edit-save"   style="background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer">Save</button>
     </div>
   </div>
 </div>
@@ -321,7 +342,8 @@ function renderGrid(){
         <div class="habit-wrap">
           <span class="h-emoji">${h.emoji||'📌'}</span>
           <span class="h-name" title="${esc(h.name)}">${esc(h.name)}</span>
-          <button class="h-del" data-hid="${h.id}">✕</button>
+          <button class="h-edit" data-hid="${h.id}" data-name="${esc(h.name)}" data-emoji="${h.emoji||'📌'}">✎</button>
+          <button class="h-del"  data-hid="${h.id}">✕</button>
         </div>
       </td>`;
     for(let d=1;d<=days;d++){
@@ -341,6 +363,10 @@ function renderGrid(){
 
 // ── Cell clicks → context menu ──
 el('cal-body').addEventListener('click', e=>{
+  // Edit habit
+  const edit = e.target.closest('.h-edit');
+  if(edit){ e.stopPropagation(); openEditModal(edit.dataset.hid, edit.dataset.name, edit.dataset.emoji); return; }
+
   // Delete habit
   const del = e.target.closest('.h-del');
   if(del){ e.stopPropagation(); deleteHabit(del.dataset.hid); return; }
@@ -454,6 +480,32 @@ async function deleteHabit(id){
   if(!confirm('Remove this habit?')) return;
   setSync('saving');
   await deleteDoc(hDoc(id));
+}
+
+// ── Edit Habit ──
+let editId = null;
+function openEditModal(id, name, emoji){
+  editId = id;
+  el('edit-emoji').value = emoji;
+  el('edit-name').value  = name;
+  el('edit-overlay').style.display = 'flex';
+  setTimeout(()=> el('edit-name').focus(), 50);
+}
+function closeEditModal(){ el('edit-overlay').style.display='none'; editId=null; }
+
+el('edit-close').addEventListener('click',  closeEditModal);
+el('edit-cancel').addEventListener('click', closeEditModal);
+el('edit-overlay').addEventListener('click', e=>{ if(e.target===el('edit-overlay')) closeEditModal(); });
+el('edit-name').addEventListener('keydown', e=>{ if(e.key==='Enter') saveEdit(); });
+el('edit-save').addEventListener('click', saveEdit);
+
+async function saveEdit(){
+  const name = el('edit-name').value.trim(); if(!name || !editId) return;
+  const emoji = el('edit-emoji').value.trim() || '📌';
+  const h = habits.find(x=>x.id===editId); if(!h) return;
+  setSync('saving');
+  await setDoc(hDoc(editId), {...h, name, emoji}, {merge:true});
+  closeEditModal();
 }
 
 // ── Navigation ──
