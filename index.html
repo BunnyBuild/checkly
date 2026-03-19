@@ -39,6 +39,11 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .mnav-btn:hover{background:#f1f3f4}
 .today-pill{border:1px solid #dadce0;border-radius:6px;padding:6px 14px;font-size:13px;font-weight:500;color:#3c4043;background:#fff;cursor:pointer;transition:background .15s}
 .today-pill:hover{background:#f1f3f4}
+.view-toggle{display:flex;gap:0;border:1px solid #dadce0;border-radius:8px;overflow:hidden;margin-left:8px}
+.vtbtn{border:none;background:#fff;padding:6px 14px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:500;color:#5f6368;cursor:pointer;transition:all .15s;border-right:1px solid #dadce0}
+.vtbtn:last-child{border-right:none}
+.vtbtn:hover{background:#f1f3f4}
+.vtbtn.active{background:#e8f0fe;color:#1a73e8;font-weight:700}
 
 /* TABLE */
 .cal-wrap{overflow-x:auto}
@@ -151,6 +156,11 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
       <button class="mnav-btn" id="btn-next">&#8250;</button>
       <div class="mnav-title" id="mnav-title"></div>
       <button class="today-pill" id="btn-today">Today</button>
+      <div class="view-toggle">
+        <button class="vtbtn active" data-v="day">Day</button>
+        <button class="vtbtn" data-v="week">Week</button>
+        <button class="vtbtn" data-v="month">Month</button>
+      </div>
     </div>
     <div class="cal-wrap">
       <table class="cal-table">
@@ -284,7 +294,7 @@ onAuthStateChanged(auth, async user => {
     el('uavatar').innerHTML  = user.photoURL
       ? `<img class="uavatar" src="${user.photoURL}"/>`
       : `<div class="uavatar-txt">${(user.displayName||'U')[0].toUpperCase()}</div>`;
-    const n=new Date(); vY=n.getFullYear(); vM=n.getMonth();
+    const n=new Date(); vY=n.getFullYear(); vM=n.getMonth(); vDay=n.getDate();
     await seedHabits();
     startListeners();
   } else {
@@ -318,20 +328,69 @@ function startListeners(){
   });
 }
 
+// ── View state ──
+let viewMode = 'day'; // 'day' | 'week' | 'month'
+let vDay = new Date().getDate();
+
+document.querySelector('.view-toggle').addEventListener('click', e=>{
+  const btn = e.target.closest('.vtbtn');
+  if(!btn) return;
+  viewMode = btn.dataset.v;
+  document.querySelectorAll('.vtbtn').forEach(b=>b.classList.toggle('active', b.dataset.v===viewMode));
+  // reset to today's date when switching
+  const t=new Date(); vY=t.getFullYear(); vM=t.getMonth(); vDay=t.getDate();
+  renderGrid();
+});
+
+function getViewDays(){
+  const today = new Date();
+  const todayFull = new Date(vY, vM, vDay);
+  if(viewMode==='day'){
+    return [{ y:vY, m:vM, d:vDay }];
+  } else if(viewMode==='week'){
+    const dow = todayFull.getDay();
+    const start = new Date(todayFull); start.setDate(todayFull.getDate()-dow);
+    const days=[];
+    for(let i=0;i<7;i++){
+      const dd=new Date(start); dd.setDate(start.getDate()+i);
+      days.push({y:dd.getFullYear(),m:dd.getMonth(),d:dd.getDate()});
+    }
+    return days;
+  } else {
+    // month
+    const total=daysInMonth(vY,vM);
+    const days=[];
+    for(let i=1;i<=total;i++) days.push({y:vY,m:vM,d:i});
+    return days;
+  }
+}
+
 // ── Render Grid ──
 function renderGrid(){
-  const days=daysInMonth(vY,vM), today=todayDk();
-  el('mnav-title').textContent = `${MONTHS[vM]} ${vY}`;
+  const viewDays = getViewDays();
+  const today = todayDk();
+
+  // Update title
+  if(viewMode==='day'){
+    const {y,m,d}=viewDays[0];
+    const dow=WDAYS[new Date(y,m,d).getDay()];
+    el('mnav-title').textContent = `${dow}, ${d} ${MONTHS[m]} ${y}`;
+  } else if(viewMode==='week'){
+    const f=viewDays[0], l=viewDays[6];
+    el('mnav-title').textContent = `${MONTHS[f.m]} ${f.d} – ${MONTHS[l.m]} ${l.d}, ${l.y}`;
+  } else {
+    el('mnav-title').textContent = `${MONTHS[vM]} ${vY}`;
+  }
 
   // Header
   let head = '<th class="name-col"></th>';
-  for(let d=1;d<=days;d++){
-    const k=makeDk(vY,vM,d), dow=new Date(vY,vM,d).getDay(), isT=k===today;
+  viewDays.forEach(({y,m,d})=>{
+    const k=makeDk(y,m,d), dow=new Date(y,m,d).getDay(), isT=k===today;
     head += `<th class="${isT?'today-col':''}" style="min-width:40px">
       <span class="col-dow">${WDAYS[dow]}</span>
       <span class="col-num">${d}</span>
     </th>`;
-  }
+  });
   el('cal-head').innerHTML = head;
 
   // Body
@@ -346,8 +405,8 @@ function renderGrid(){
           <button class="h-del"  data-hid="${h.id}">✕</button>
         </div>
       </td>`;
-    for(let d=1;d<=days;d++){
-      const k=makeDk(vY,vM,d), ck=`${h.id}_${k}`, c=cells[ck]||{};
+    viewDays.forEach(({y,m,d})=>{
+      const k=makeDk(y,m,d), ck=`${h.id}_${k}`, c=cells[ck]||{};
       const st=c.status||'none', hasNote=!!(c.note&&c.note.trim()), isT=k===today;
       body += `<td class="cell-td">
         <div class="cell s-${st} ${isT?'is-today':''}"
@@ -355,7 +414,7 @@ function renderGrid(){
           ${hasNote?'<div class="note-dot"></div>':''}
         </div>
       </td>`;
-    }
+    });
     body += '</tr>';
   });
   el('cal-body').innerHTML = body;
@@ -391,13 +450,18 @@ function showCtxMenu(x, y){
   if(r.bottom > window.innerHeight - 8) m.style.top  = (window.innerHeight - r.height - 8)+'px';
 }
 
-function hideCtxMenu(){ el('ctx-menu').classList.remove('show'); ctxTarget=null; }
+function hideCtxMenu(){ el('ctx-menu').classList.remove('show'); }
 
 // Context menu actions
 el('ctx-red').addEventListener('click',    e=>{ e.stopPropagation(); setStatus('red');    hideCtxMenu(); });
 el('ctx-yellow').addEventListener('click', e=>{ e.stopPropagation(); setStatus('yellow'); hideCtxMenu(); });
 el('ctx-green').addEventListener('click',  e=>{ e.stopPropagation(); setStatus('green');  hideCtxMenu(); });
-el('ctx-note').addEventListener('click',   e=>{ e.stopPropagation(); hideCtxMenu(); openPanel(ctxTarget.habitId, ctxTarget.dk); });
+el('ctx-note').addEventListener('click', e=>{
+  e.stopPropagation();
+  const h = ctxTarget.habitId, d = ctxTarget.dk;
+  hideCtxMenu();
+  openPanel(h, d);
+});
 
 async function setStatus(status){
   if(!ctxTarget) return;
@@ -407,7 +471,7 @@ async function setStatus(status){
 }
 
 // Close context menu on outside click
-document.addEventListener('click', ()=> hideCtxMenu());
+document.addEventListener('click', ()=>{ el('ctx-menu').classList.remove('show'); ctxTarget=null; });
 
 // ── Panel ──
 function openPanel(habitId, dk){
@@ -509,10 +573,20 @@ async function saveEdit(){
 }
 
 // ── Navigation ──
-el('btn-prev').addEventListener('click', ()=>{ vM--; if(vM<0){vM=11;vY--;} renderGrid(); });
-el('btn-next').addEventListener('click', ()=>{ vM++; if(vM>11){vM=0;vY++;} renderGrid(); });
+el('btn-prev').addEventListener('click', ()=>{
+  if(viewMode==='day'){ const d=new Date(vY,vM,vDay-1); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
+  else if(viewMode==='week'){ const d=new Date(vY,vM,vDay-7); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
+  else { vM--; if(vM<0){vM=11;vY--;} }
+  renderGrid();
+});
+el('btn-next').addEventListener('click', ()=>{
+  if(viewMode==='day'){ const d=new Date(vY,vM,vDay+1); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
+  else if(viewMode==='week'){ const d=new Date(vY,vM,vDay+7); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
+  else { vM++; if(vM>11){vM=0;vY++;} }
+  renderGrid();
+});
 el('btn-today').addEventListener('click', ()=>{
-  const t=new Date(); vY=t.getFullYear(); vM=t.getMonth(); renderGrid();
+  const t=new Date(); vY=t.getFullYear(); vM=t.getMonth(); vDay=t.getDate(); renderGrid();
   setTimeout(()=>{ const c=document.querySelector('.is-today'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
 });
 </script>
