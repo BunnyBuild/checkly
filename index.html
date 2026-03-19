@@ -49,7 +49,7 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .cal-wrap{overflow-x:auto}
 .cal-table{border-collapse:collapse;min-width:max-content;width:100%}
 .cal-table thead th{text-align:center;padding:0 4px 12px;min-width:40px;border-bottom:1px solid #e0e0e0}
-.cal-table thead th.name-col{min-width:200px;text-align:left;padding-left:0;padding-right:16px}
+.cal-table thead th.name-col{min-width:220px;text-align:left;padding-left:0;padding-right:16px}
 .col-dow{display:block;font-size:10px;font-weight:500;color:#70757a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 .col-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:400;color:#3c4043}
 .today-col .col-dow{color:#1a73e8}
@@ -58,10 +58,10 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .cal-table tbody tr{border-bottom:1px solid #f1f3f4}
 .cal-table tbody tr:hover{background:#fafafa}
 .cal-table tbody td{padding:6px 4px;vertical-align:middle}
-.habit-td{padding-left:0 !important;padding-right:16px !important}
-.habit-wrap{display:flex;align-items:center;gap:8px;max-width:195px}
+.habit-td{padding-left:0 !important;padding-right:16px !important;min-width:220px;white-space:nowrap}
+.habit-wrap{display:flex;align-items:center;gap:8px;width:200px}
 .h-emoji{font-size:15px;flex-shrink:0}
-.h-name{font-size:13px;font-weight:500;color:#3c4043;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.h-name{font-size:13px;font-weight:500;color:#3c4043;white-space:nowrap;overflow:visible;text-overflow:unset;flex:1;min-width:120px}
 .h-del{background:none;border:none;color:#dadce0;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0;transition:all .15s;flex-shrink:0}
 .cal-table tbody tr:hover .h-del{opacity:1}
 .h-del:hover{color:#d93025;background:#fce8e6}
@@ -154,7 +154,8 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
     <div class="mnav">
       <button class="mnav-btn" id="btn-prev">&#8249;</button>
       <button class="mnav-btn" id="btn-next">&#8250;</button>
-      <div class="mnav-title" id="mnav-title"></div>
+      <div class="mnav-title" id="mnav-title" id="mnav-title"></div>
+      <input type="date" id="date-picker" title="Jump to date" style="border:1px solid #dadce0;border-radius:6px;padding:5px 10px;font-size:13px;font-family:'Google Sans',sans-serif;color:#3c4043;outline:none;cursor:pointer;background:#fff"/>
       <button class="today-pill" id="btn-today">Today</button>
       <div class="view-toggle">
         <button class="vtbtn active" data-v="day">Day</button>
@@ -418,6 +419,10 @@ function renderGrid(){
     body += '</tr>';
   });
   el('cal-body').innerHTML = body;
+  // Auto-scroll to today column in month/week view
+  if(viewMode !== 'day'){
+    setTimeout(()=>{ const c=document.querySelector('.is-today'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'}); },80);
+  }
 }
 
 // ── Cell clicks → context menu ──
@@ -588,6 +593,14 @@ el('btn-next').addEventListener('click', ()=>{
 el('btn-today').addEventListener('click', ()=>{
   const t=new Date(); vY=t.getFullYear(); vM=t.getMonth(); vDay=t.getDate(); renderGrid();
   setTimeout(()=>{ const c=document.querySelector('.is-today'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
+});
+
+el('date-picker').addEventListener('change', e=>{
+  const [y,m,d] = e.target.value.split('-').map(Number);
+  if(!y) return;
+  vY=y; vM=m-1; vDay=d;
+  renderGrid();
+  setTimeout(()=>{ const c=document.querySelector('.is-today,.cell.active-cell'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
 });
 </script>
 </body>
