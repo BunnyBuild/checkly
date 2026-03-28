@@ -47,9 +47,9 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 
 /* TABLE */
 .cal-wrap{overflow-x:auto}
-.cal-table{border-collapse:collapse;min-width:max-content;width:100%}
+.cal-table{border-collapse:collapse;min-width:max-content;table-layout:fixed}
 .cal-table thead th{text-align:center;padding:0 4px 12px;min-width:40px;border-bottom:1px solid #e0e0e0}
-.cal-table thead th.name-col{min-width:220px;text-align:left;padding-left:0;padding-right:16px}
+.cal-table thead th.name-col{width:240px;min-width:240px;max-width:240px;text-align:left;padding-left:0;padding-right:8px}
 .col-dow{display:block;font-size:10px;font-weight:500;color:#70757a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 .col-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:400;color:#3c4043}
 .today-col .col-dow{color:#1a73e8}
@@ -58,10 +58,10 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .cal-table tbody tr{border-bottom:1px solid #f1f3f4}
 .cal-table tbody tr:hover{background:#fafafa}
 .cal-table tbody td{padding:6px 4px;vertical-align:middle}
-.habit-td{padding-left:0 !important;padding-right:16px !important;min-width:220px;white-space:nowrap}
-.habit-wrap{display:flex;align-items:center;gap:8px;width:200px}
+.habit-td{padding-left:0 !important;padding-right:8px !important;width:240px;min-width:240px;max-width:240px}
+.habit-wrap{display:flex;align-items:center;gap:8px;width:220px;min-width:220px;max-width:220px}
 .h-emoji{font-size:15px;flex-shrink:0}
-.h-name{font-size:13px;font-weight:500;color:#3c4043;white-space:nowrap;overflow:visible;text-overflow:unset;flex:1;min-width:120px}
+.h-name{font-size:13px;font-weight:500;color:#3c4043;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;max-width:160px}
 .h-del{background:none;border:none;color:#dadce0;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0;transition:all .15s;flex-shrink:0}
 .cal-table tbody tr:hover .h-del{opacity:1}
 .h-del:hover{color:#d93025;background:#fce8e6}
@@ -387,7 +387,7 @@ function renderGrid(){
   let head = '<th class="name-col"></th>';
   viewDays.forEach(({y,m,d})=>{
     const k=makeDk(y,m,d), dow=new Date(y,m,d).getDay(), isT=k===today;
-    head += `<th class="${isT?'today-col':''}" style="min-width:40px">
+    head += `<th class="${isT?'today-col':''}" style="width:36px;min-width:36px;max-width:36px">
       <span class="col-dow">${WDAYS[dow]}</span>
       <span class="col-num">${d}</span>
     </th>`;
