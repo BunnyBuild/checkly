@@ -124,6 +124,30 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .p-save{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:14px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer;transition:background .15s}
 .p-save:hover{background:#1765cc}
 .p-saved{font-size:12px;color:#34a853;display:none}
+
+/* Full name tooltip */
+.habit-wrap{position:relative}
+.h-tooltip{
+  display:none;
+  position:absolute;
+  left:0;top:calc(100% + 6px);
+  background:#202124;color:#fff;
+  font-size:12px;font-weight:500;
+  padding:6px 10px;border-radius:6px;
+  white-space:nowrap;z-index:500;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  pointer-events:none;
+  max-width:360px;
+  white-space:normal;
+  line-height:1.4;
+}
+.h-tooltip::before{
+  content:'';position:absolute;
+  bottom:100%;left:16px;
+  border:5px solid transparent;
+  border-bottom-color:#202124;
+}
+.habit-wrap:hover .h-tooltip{display:block}
 </style>
 </head>
 <body>
@@ -401,9 +425,10 @@ function renderGrid(){
       <td class="habit-td">
         <div class="habit-wrap">
           <span class="h-emoji">${h.emoji||'📌'}</span>
-          <span class="h-name" title="${esc(h.name)}">${esc(h.name)}</span>
+          <span class="h-name">${esc(h.name)}</span>
           <button class="h-edit" data-hid="${h.id}" data-name="${esc(h.name)}" data-emoji="${h.emoji||'📌'}">✎</button>
           <button class="h-del"  data-hid="${h.id}">✕</button>
+          <div class="h-tooltip">${esc(h.name)}</div>
         </div>
       </td>`;
     viewDays.forEach(({y,m,d})=>{
