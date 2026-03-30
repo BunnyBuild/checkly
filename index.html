@@ -230,7 +230,7 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 /* ── SPLIT VIEW ── */
 #app-body {
   display: flex;
-  height: calc(100vh - 49px - 44px - 44px); 
+  /* height: calc(100vh - 49px - 44px - 44px);  */
   /* topbar + quote bar + links bar */
   overflow: hidden;
 }
@@ -246,21 +246,15 @@ html, body {
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  overflow-x: hidden;
-  transition: flex .3s ease;
 }
+
 #right-panel {
   width: 0;
-  height: 100%;
   flex-shrink: 0;
-  border-left: 1px solid #e0e0e0;
-  background: #f8f9fa;
   transition: width .3s ease;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  height: 100%;
 }
+
 #right-panel.open {
   width: 50%;
 }
