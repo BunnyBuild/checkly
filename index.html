@@ -148,6 +148,59 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
   border-bottom-color:#202124;
 }
 .habit-wrap:hover .h-tooltip{display:block}
+
+/* ── LINKS BAR ── */
+.links-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 24px;
+  background:#f8f9fa;
+  border-bottom:1px solid #e0e0e0;
+  overflow-x:auto;
+  scrollbar-width:none;
+  flex-wrap:nowrap;
+}
+.links-bar::-webkit-scrollbar{display:none}
+.links-bar-label{
+  font-size:12px;font-weight:600;color:#5f6368;
+  white-space:nowrap;display:flex;align-items:center;gap:5px;
+  flex-shrink:0;
+}
+.link-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#fff;border:1px solid #dadce0;border-radius:20px;
+  padding:5px 12px;font-size:12px;font-weight:500;color:#1a73e8;
+  text-decoration:none;white-space:nowrap;cursor:pointer;
+  transition:all .15s;flex-shrink:0;
+}
+.link-chip:hover{background:#e8f0fe;border-color:#1a73e8;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.link-chip-icon{font-size:13px}
+.link-chip-del{
+  background:none;border:none;color:#9aa0a6;cursor:pointer;
+  font-size:13px;line-height:1;padding:0 0 0 2px;
+  transition:color .15s;display:none;
+}
+.link-chip:hover .link-chip-del{display:inline}
+.link-chip-del:hover{color:#d93025}
+.add-link-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:transparent;border:1px dashed #dadce0;border-radius:20px;
+  padding:5px 12px;font-size:12px;font-weight:500;color:#5f6368;
+  cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;
+}
+.add-link-btn:hover{border-color:#1a73e8;color:#1a73e8;background:#e8f0fe}
+
+/* Add Link Modal */
+#link-modal-overlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.3);align-items:center;justify-content:center}
+#link-modal-overlay.show{display:flex}
+#link-modal{background:#fff;border-radius:12px;padding:22px;width:380px;box-shadow:0 8px 30px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:14px}
+.lm-title{font-size:15px;font-weight:700;color:#202124}
+.lm-input{width:100%;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Google Sans',sans-serif;color:#202124;outline:none;transition:border-color .15s}
+.lm-input:focus{border-color:#1a73e8;background:#fff}
+.lm-input::placeholder{color:#9aa0a6}
+.lm-actions{display:flex;gap:8px;justify-content:flex-end}
+.lm-cancel{border:1px solid #dadce0;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:500;color:#3c4043;background:#fff;cursor:pointer}
+.lm-save{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer}
+.lm-save:hover{background:#1765cc}
 </style>
 </head>
 <body>
@@ -174,16 +227,42 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
       <button class="tbtn" id="btn-signout">Sign out</button>
     </div>
   </div>
+  <!-- LINKS BAR -->
+  <div class="links-bar" id="links-bar">
+    <div class="links-bar-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Quick Links
+    </div>
+    <div id="links-container"></div>
+    <button class="add-link-btn" id="btn-add-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add link
+    </button>
+  </div>
+
+  <!-- ADD LINK MODAL -->
+  <div id="link-modal-overlay">
+    <div id="link-modal">
+      <div class="lm-title">Add Quick Link</div>
+      <input class="lm-input" id="lm-name" placeholder="Name (e.g. LeetCode, GitHub...)"/>
+      <input class="lm-input" id="lm-url"  placeholder="URL (e.g. https://leetcode.com)"/>
+      <div class="lm-actions">
+        <button class="lm-cancel" id="lm-cancel">Cancel</button>
+        <button class="lm-save"   id="lm-save">Add</button>
+      </div>
+    </div>
+  </div>
+
   <div class="main">
     <div class="mnav">
       <button class="mnav-btn" id="btn-prev">&#8249;</button>
       <button class="mnav-btn" id="btn-next">&#8250;</button>
       <div class="mnav-title" id="mnav-title" id="mnav-title"></div>
       <input type="date" id="date-picker" title="Jump to date" style="border:1px solid #dadce0;border-radius:6px;padding:5px 10px;font-size:13px;font-family:'Google Sans',sans-serif;color:#3c4043;outline:none;cursor:pointer;background:#fff"/>
-      <!-- <button class="today-pill" id="btn-today">Today</button> -->
+      <button class="today-pill" id="btn-today">Today</button>
       <div class="view-toggle">
-        <button class="vtbtn" data-v="day">Day</button>
-        <button class="vtbtn active" data-v="week">Week</button>
+        <button class="vtbtn active" data-v="day">Day</button>
+        <button class="vtbtn" data-v="week">Week</button>
         <button class="vtbtn" data-v="month">Month</button>
       </div>
     </div>
@@ -271,6 +350,16 @@ const db   = getFirestore(app);
 
 // ── Constants ──
 const DEFAULTS = [
+  {id:'dsa',    emoji:'🧠', name:'DSA Practice'},
+  {id:'jobs',   emoji:'💼', name:'Job Applications'},
+  {id:'gym',    emoji:'💪', name:'Exercise'},
+  {id:'learn',  emoji:'📖', name:'Learn One Concept'},
+  {id:'career', emoji:'🚀', name:'Career Signal'},
+  {id:'work',   emoji:'⚙️',  name:'Deep Work'},
+  {id:'read',   emoji:'📰', name:'Read Tech Article'},
+  {id:'finance',emoji:'💰', name:'Finance Learning'},
+  {id:'side',   emoji:'🛠️', name:'Side Project'},
+  {id:'ai',     emoji:'🤖', name:'AI Tool Practice'},
   {id:'health', emoji:'🥗', name:'Gym / Food / Diet'},
 ];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -312,6 +401,7 @@ onAuthStateChanged(auth, async user => {
     const n=new Date(); vY=n.getFullYear(); vM=n.getMonth(); vDay=n.getDate();
     await seedHabits();
     startListeners();
+    listenLinks();
   } else {
     uid=null;
     el('auth').style.display = 'flex';
@@ -344,7 +434,7 @@ function startListeners(){
 }
 
 // ── View state ──
-let viewMode = 'week'; // 'day' | 'week' | 'month'
+let viewMode = 'day'; // 'day' | 'week' | 'month'
 let vDay = new Date().getDate();
 
 document.querySelector('.view-toggle').addEventListener('click', e=>{
@@ -593,6 +683,73 @@ async function saveEdit(){
 }
 
 // ── Navigation ──
+// ── LINKS ──
+let userLinks = [];
+let linkUnsub = null;
+
+function linksCol(){ return collection(db,'users',uid,'links'); }
+function linkDoc(id){ return doc(db,'users',uid,'links',id); }
+
+function listenLinks(){
+  if(linkUnsub) linkUnsub();
+  linkUnsub = onSnapshot(linksCol(), snap=>{
+    userLinks = snap.docs.map(d=>d.data()).sort((a,b)=>(a.order||0)-(b.order||0));
+    renderLinks();
+  });
+}
+
+function renderLinks(){
+  const c = document.getElementById('links-container');
+  c.innerHTML = '';
+  userLinks.forEach(lk=>{
+    const chip = document.createElement('a');
+    chip.className = 'link-chip';
+    chip.href = lk.url;
+    chip.target = '_blank';
+    chip.rel = 'noopener noreferrer';
+    // favicon
+    const domain = (() => { try { return new URL(lk.url).hostname; } catch(e){ return ''; } })();
+    const faviconSrc = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=16` : '';
+    chip.innerHTML = faviconSrc
+      ? `<img src="${faviconSrc}" width="14" height="14" style="border-radius:2px;flex-shrink:0"/>`
+      : `<span class="link-chip-icon">🔗</span>`;
+    chip.innerHTML += `<span>${esc(lk.name)}</span><button class="link-chip-del" data-lid="${lk.id}" title="Remove">✕</button>`;
+    // delete handler
+    chip.querySelector('.link-chip-del').addEventListener('click', async e=>{
+      e.preventDefault(); e.stopPropagation();
+      await deleteDoc(linkDoc(lk.id));
+    });
+    c.appendChild(chip);
+  });
+}
+
+// Add link modal
+document.getElementById('btn-add-link').addEventListener('click', ()=>{
+  document.getElementById('lm-name').value='';
+  document.getElementById('lm-url').value='';
+  document.getElementById('link-modal-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('lm-name').focus(),50);
+});
+document.getElementById('lm-cancel').addEventListener('click', ()=>document.getElementById('link-modal-overlay').classList.remove('show'));
+document.getElementById('link-modal-overlay').addEventListener('click', e=>{
+  if(e.target===document.getElementById('link-modal-overlay')) document.getElementById('link-modal-overlay').classList.remove('show');
+});
+document.getElementById('lm-url').addEventListener('keydown', e=>{ if(e.key==='Enter') saveLinkModal(); });
+document.getElementById('lm-save').addEventListener('click', saveLinkModal);
+
+async function saveLinkModal(){
+  let name = document.getElementById('lm-name').value.trim();
+  let url  = document.getElementById('lm-url').value.trim();
+  if(!url) return;
+  if(!url.startsWith('http')) url = 'https://' + url;
+  if(!name) name = url;
+  const id = 'lk_' + Date.now();
+  setSync('saving');
+  await setDoc(linkDoc(id), {id, name, url, order: userLinks.length});
+  document.getElementById('link-modal-overlay').classList.remove('show');
+}
+
+// Hook into auth flow — add listenLinks() call
 el('btn-prev').addEventListener('click', ()=>{
   if(viewMode==='day'){ const d=new Date(vY,vM,vDay-1); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
   else if(viewMode==='week'){ const d=new Date(vY,vM,vDay-7); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
