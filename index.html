@@ -7,8 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#202124;min-height:100vh;overflow:hidden}
-
+body {
+  font-family:'Google Sans','Segoe UI',sans-serif;
+  background:#fff;
+  color:#202124;
+  min-height:100vh;
+  overflow:auto; 
+}
 /* AUTH */
 #auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fa}
 .auth-box{background:#fff;border:1px solid #dadce0;border-radius:12px;padding:2.5rem 2rem;width:360px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1)}
@@ -141,6 +146,7 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
   white-space:normal;
   line-height:1.4;
 }
+
 .h-tooltip::before{
   content:'';position:absolute;
   bottom:100%;left:16px;
@@ -247,7 +253,9 @@ html, body {
   min-width: 0;
   overflow-y: auto;
 }
-
+#left-panel {
+  overflow-y: auto;
+}
 #right-panel {
   width: 0;
   flex-shrink: 0;
