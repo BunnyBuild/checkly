@@ -236,9 +236,11 @@ body {
 /* ── SPLIT VIEW ── */
 #app-body {
   display: flex;
+  flex: 1;
   /* height: calc(100vh - 49px - 44px - 44px);  */
   /* topbar + quote bar + links bar */
   overflow: hidden;
+  height: 100%;
 }
 html, body {
   height: 100%;
@@ -260,11 +262,13 @@ html, body {
   width: 0;
   flex-shrink: 0;
   transition: width .3s ease;
-  height: 100%;
+  display: flex; 
+  flex-direction: column;
 }
 
 #right-panel.open {
   width: 50%;
+   min-width: 400px;
 }
 .rp-topbar {
   display: flex;
@@ -306,7 +310,9 @@ html, body {
   flex: 1;
   border: none;
   width: 100%;
+  height: 100%;
   background: #fff;
+  border: none;
 }
 .rp-blocked {
   flex: 1;
