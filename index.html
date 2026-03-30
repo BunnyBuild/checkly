@@ -446,8 +446,10 @@ html, body {
   </div>
 
   <div id="app-body">
+
+  <!-- LEFT PANEL -->
   <div id="left-panel">
-  <div class="main">
+    <div class="main">
     <div class="mnav">
       <button class="mnav-btn" id="btn-prev">&#8249;</button>
       <button class="mnav-btn" id="btn-next">&#8250;</button>
@@ -490,8 +492,27 @@ html, body {
       <button id="edit-save"   style="background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer">Save</button>
     </div>
   </div>
-  </div><!-- .main -->
-  </div><!-- #left-panel -->
+  </div>
+
+  <!-- RIGHT PANEL (FIXED POSITION) -->
+  <div id="right-panel">
+    <div class="rp-topbar">
+      <span class="rp-title" id="rp-title">—</span>
+      <button class="rp-btn" id="rp-newtab">↗ New tab</button>
+      <button class="rp-btn danger" id="rp-close">✕</button>
+    </div>
+
+    <iframe id="right-iframe"></iframe>
+
+    <div class="rp-blocked" id="rp-blocked">
+      <div>🚫</div>
+      <div>This site doesn't allow embedding</div>
+      <a id="rp-blocked-link" target="_blank">Open in new tab</a>
+    </div>
+  </div>
+
+</div>
+
 
   <!-- RIGHT PANEL -->
   <div id="right-panel">
