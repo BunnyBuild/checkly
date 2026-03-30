@@ -913,15 +913,19 @@ document.getElementById('rp-newtab').addEventListener('click', ()=>{
 function renderLinks(){
   const c = document.getElementById('links-container');
   c.innerHTML = '';
+
   userLinks.forEach(lk=>{
     const domain = (() => { try { return new URL(lk.url).hostname; } catch(e){ return ''; } })();
     const faviconSrc = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=16` : '';
+
     const chip = document.createElement('div');
     chip.className = 'link-chip';
+
     chip.innerHTML = `
       ${faviconSrc ? `<img src="${faviconSrc}" width="14" height="14" style="border-radius:2px;flex-shrink:0"/>` : '<span class="link-chip-icon">🔗</span>'}
       <span>${esc(lk.name)}</span>
       <button class="link-chip-del" data-lid="${lk.id}" title="Remove">✕</button>
+
       <div class="chip-actions">
         <div class="chip-action-row" data-action="sidebar" data-url="${esc(lk.url)}" data-name="${esc(lk.name)}">
           ⬛ Open in sidebar
@@ -929,17 +933,32 @@ function renderLinks(){
         <a class="chip-action-row" href="${esc(lk.url)}" target="_blank" rel="noopener noreferrer">
           ↗ Open in new tab
         </a>
-      </div>`;
-    // sidebar click
+      </div>
+    `;
+
+    // ✅ MAIN FIX → click anywhere on chip opens right panel
+    chip.addEventListener('click', (e) => {
+      if (
+        e.target.closest('.link-chip-del') ||
+        e.target.closest('.chip-actions')
+      ) return;
+
+      openInSidebar(lk.url, lk.name);
+    });
+
+    // sidebar button (still works)
     chip.querySelector('[data-action="sidebar"]').addEventListener('click', e=>{
       e.stopPropagation();
       openInSidebar(lk.url, lk.name);
     });
-    // delete
+
+    // delete button
     chip.querySelector('.link-chip-del').addEventListener('click', async e=>{
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       await deleteDoc(linkDoc(lk.id));
     });
+
     c.appendChild(chip);
   });
 }
