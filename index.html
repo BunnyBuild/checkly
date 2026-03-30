@@ -323,7 +323,18 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 }
 
 /* Link chip hover options */
-.link-chip { position: relative; }
+.link-chip { position: relative; 
+           cursor: pointer;}
+/* Ensure chip click is not blocked */
+.link-chip span,
+.link-chip img {
+  pointer-events: none;
+}
+
+/* Allow menu interaction */
+.chip-actions {
+  pointer-events: auto;
+}
 .chip-actions {
   display: none;
   position: absolute;
@@ -887,14 +898,26 @@ function openInSidebar(url, name){
   const title  = document.getElementById('rp-title');
   const blocked = document.getElementById('rp-blocked');
   const blockedLink = document.getElementById('rp-blocked-link');
+
   title.textContent = name;
+
+  // FORCE PANEL OPEN
+  panel.classList.add('open');
+
   iframe.style.display = 'block';
   blocked.style.display = 'none';
+
   blockedLink.href = url;
   document.getElementById('rp-newtab').dataset.url = url;
-  panel.classList.add('open');
-  iframe.src = url;
-  // Detect if blocked by X-Frame-Options after short delay
+
+  // Reset iframe (important)
+  iframe.src = "about:blank";
+
+  setTimeout(() => {
+    iframe.src = url;
+  }, 50);
+
+  // Handle blocked sites
   iframe.onerror = () => {
     iframe.style.display = 'none';
     blocked.style.display = 'flex';
@@ -927,32 +950,33 @@ function renderLinks(){
       <button class="link-chip-del" data-lid="${lk.id}" title="Remove">✕</button>
 
       <div class="chip-actions">
-        <div class="chip-action-row" data-action="sidebar" data-url="${esc(lk.url)}" data-name="${esc(lk.name)}">
+        <div class="chip-action-row" data-action="sidebar">
           ⬛ Open in sidebar
         </div>
-        <a class="chip-action-row" href="${esc(lk.url)}" target="_blank" rel="noopener noreferrer">
+        <a class="chip-action-row" href="${esc(lk.url)}" target="_blank">
           ↗ Open in new tab
         </a>
       </div>
     `;
 
-    // ✅ MAIN FIX → click anywhere on chip opens right panel
+    // ✅ MAIN CLICK → OPEN SIDEBAR
     chip.addEventListener('click', (e) => {
       if (
         e.target.closest('.link-chip-del') ||
         e.target.closest('.chip-actions')
       ) return;
 
+      console.log("Opening:", lk.url);
       openInSidebar(lk.url, lk.name);
-    });
+    }, true); // capture phase
 
-    // sidebar button (still works)
+    // sidebar option click
     chip.querySelector('[data-action="sidebar"]').addEventListener('click', e=>{
       e.stopPropagation();
       openInSidebar(lk.url, lk.name);
     });
 
-    // delete button
+    // delete
     chip.querySelector('.link-chip-del').addEventListener('click', async e=>{
       e.preventDefault();
       e.stopPropagation();
