@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#202124;min-height:100vh}
+body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#202124;min-height:100vh;overflow:hidden}
 
 /* AUTH */
 #auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fa}
@@ -32,7 +32,7 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .uavatar-txt{width:30px;height:30px;border-radius:50%;background:#e8f0fe;color:#1a73e8;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
 /* MAIN */
-.main{padding:20px 24px}
+.main{padding:20px 24px;min-width:0}
 .mnav{display:flex;align-items:center;gap:8px;margin-bottom:24px}
 .mnav-title{font-size:22px;font-weight:400;color:#3c4043;min-width:180px}
 .mnav-btn{width:32px;height:32px;border-radius:50%;background:transparent;border:none;color:#3c4043;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
@@ -226,6 +226,136 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
   border-radius:4px;transition:all .15s;flex-shrink:0;
 }
 .quote-refresh:hover{color:#1a73e8;background:#fff}
+
+/* ── SPLIT VIEW ── */
+#app-body {
+  display: flex;
+  height: calc(100vh - 49px); /* below topbar */
+  overflow: hidden;
+}
+#left-panel {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: flex .3s ease;
+}
+#right-panel {
+  width: 0;
+  flex-shrink: 0;
+  border-left: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  transition: width .3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#right-panel.open {
+  width: 50%;
+}
+.rp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+.rp-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c4043;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rp-btn {
+  background: none;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 500;
+  color: #5f6368;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rp-btn:hover { background: #f1f3f4; }
+.rp-btn.danger:hover { background: #fce8e6; border-color: #ea4335; color: #d93025; }
+#right-iframe {
+  flex: 1;
+  border: none;
+  width: 100%;
+  background: #fff;
+}
+.rp-blocked {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2rem;
+  text-align: center;
+  display: none;
+}
+.rp-blocked-icon { font-size: 40px; }
+.rp-blocked-msg { font-size: 14px; color: #5f6368; line-height: 1.5; }
+.rp-blocked-link {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Link chip hover options */
+.link-chip { position: relative; }
+.chip-actions {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  padding: 4px;
+  z-index: 500;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  white-space: nowrap;
+}
+.link-chip:hover .chip-actions { display: flex; }
+.chip-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background .1s;
+  text-decoration: none;
+}
+.chip-action-row:hover { background: #f1f3f4; color: #1a73e8; }
 </style>
 </head>
 <body>
@@ -286,6 +416,8 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
     </div>
   </div>
 
+  <div id="app-body">
+  <div id="left-panel">
   <div class="main">
     <div class="mnav">
       <button class="mnav-btn" id="btn-prev">&#8249;</button>
@@ -329,7 +461,25 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
       <button id="edit-save"   style="background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer">Save</button>
     </div>
   </div>
-</div>
+  </div><!-- .main -->
+  </div><!-- #left-panel -->
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="rp-topbar">
+      <span class="rp-title" id="rp-title">—</span>
+      <button class="rp-btn" id="rp-newtab" title="Open in new tab">↗ New tab</button>
+      <button class="rp-btn danger" id="rp-close" title="Close panel">✕</button>
+    </div>
+    <iframe id="right-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"></iframe>
+    <div class="rp-blocked" id="rp-blocked">
+      <div class="rp-blocked-icon">🚫</div>
+      <div class="rp-blocked-msg">This site doesn't allow embedding.<br>Open it in a new tab instead.</div>
+      <a class="rp-blocked-link" id="rp-blocked-link" target="_blank" rel="noopener">Open in new tab ↗</a>
+    </div>
+  </div>
+
+  </div><!-- #app-body -->
 
 <!-- CONTEXT MENU -->
 <div id="ctx-menu">
@@ -731,23 +881,61 @@ function listenLinks(){
   });
 }
 
+function openInSidebar(url, name){
+  const panel = document.getElementById('right-panel');
+  const iframe = document.getElementById('right-iframe');
+  const title  = document.getElementById('rp-title');
+  const blocked = document.getElementById('rp-blocked');
+  const blockedLink = document.getElementById('rp-blocked-link');
+  title.textContent = name;
+  iframe.style.display = 'block';
+  blocked.style.display = 'none';
+  blockedLink.href = url;
+  document.getElementById('rp-newtab').dataset.url = url;
+  panel.classList.add('open');
+  iframe.src = url;
+  // Detect if blocked by X-Frame-Options after short delay
+  iframe.onerror = () => {
+    iframe.style.display = 'none';
+    blocked.style.display = 'flex';
+  };
+}
+
+document.getElementById('rp-close').addEventListener('click', ()=>{
+  document.getElementById('right-panel').classList.remove('open');
+  document.getElementById('right-iframe').src = 'about:blank';
+});
+document.getElementById('rp-newtab').addEventListener('click', ()=>{
+  const url = document.getElementById('rp-newtab').dataset.url;
+  if(url) window.open(url, '_blank');
+});
+
 function renderLinks(){
   const c = document.getElementById('links-container');
   c.innerHTML = '';
   userLinks.forEach(lk=>{
-    const chip = document.createElement('a');
-    chip.className = 'link-chip';
-    chip.href = lk.url;
-    chip.target = '_blank';
-    chip.rel = 'noopener noreferrer';
-    // favicon
     const domain = (() => { try { return new URL(lk.url).hostname; } catch(e){ return ''; } })();
     const faviconSrc = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=16` : '';
-    chip.innerHTML = faviconSrc
-      ? `<img src="${faviconSrc}" width="14" height="14" style="border-radius:2px;flex-shrink:0"/>`
-      : `<span class="link-chip-icon">🔗</span>`;
-    chip.innerHTML += `<span>${esc(lk.name)}</span><button class="link-chip-del" data-lid="${lk.id}" title="Remove">✕</button>`;
-    // delete handler
+    const chip = document.createElement('div');
+    chip.className = 'link-chip';
+    chip.innerHTML = `
+      ${faviconSrc ? `<img src="${faviconSrc}" width="14" height="14" style="border-radius:2px;flex-shrink:0"/>` : '<span class="link-chip-icon">🔗</span>'}
+      <span>${esc(lk.name)}</span>
+      <button class="link-chip-del" data-lid="${lk.id}" title="Remove">✕</button>
+      <div class="chip-actions">
+        <div class="chip-action-row" data-action="sidebar" data-url="${esc(lk.url)}" data-name="${esc(lk.name)}">
+          ⬛ Open in sidebar
+        </div>
+        <a class="chip-action-row" href="${esc(lk.url)}" target="_blank" rel="noopener noreferrer">
+          ↗ Open in new tab
+        </a>
+      </div>`;
+    // sidebar click
+    chip.querySelector('[data-action="sidebar"]').addEventListener('click', e=>{
+      e.stopPropagation();
+      openInSidebar(lk.url, lk.name);
+    });
+    // delete
     chip.querySelector('.link-chip-del').addEventListener('click', async e=>{
       e.preventDefault(); e.stopPropagation();
       await deleteDoc(linkDoc(lk.id));
