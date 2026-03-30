@@ -201,6 +201,31 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
 .lm-cancel{border:1px solid #dadce0;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:500;color:#3c4043;background:#fff;cursor:pointer}
 .lm-save{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Google Sans',sans-serif;font-weight:600;cursor:pointer}
 .lm-save:hover{background:#1765cc}
+
+/* ── QUOTE BAR ── */
+.quote-bar{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:10px 24px;
+  background:linear-gradient(135deg,#e8f0fe 0%,#f3e8ff 100%);
+  border-bottom:1px solid #e0e0e0;
+  min-height:44px;
+}
+.quote-icon{font-size:16px;flex-shrink:0}
+.quote-text{
+  font-size:13px;font-style:italic;color:#3c4043;
+  text-align:center;line-height:1.5;flex:1;
+  max-width:700px;
+}
+.quote-author{
+  font-size:11px;font-weight:600;color:#5f6368;
+  white-space:nowrap;flex-shrink:0;
+}
+.quote-refresh{
+  background:none;border:none;color:#9aa0a6;
+  cursor:pointer;font-size:14px;padding:2px 4px;
+  border-radius:4px;transition:all .15s;flex-shrink:0;
+}
+.quote-refresh:hover{color:#1a73e8;background:#fff}
 </style>
 </head>
 <body>
@@ -227,6 +252,14 @@ body{font-family:'Google Sans','Segoe UI',sans-serif;background:#fff;color:#2021
       <button class="tbtn" id="btn-signout">Sign out</button>
     </div>
   </div>
+  <!-- QUOTE BAR -->
+  <div class="quote-bar" id="quote-bar">
+    <span class="quote-icon">✨</span>
+    <span class="quote-text" id="quote-text">Loading today's quote...</span>
+    <span class="quote-author" id="quote-author"></span>
+    <button class="quote-refresh" id="btn-quote-refresh" title="New quote">↻</button>
+  </div>
+
   <!-- LINKS BAR -->
   <div class="links-bar" id="links-bar">
     <div class="links-bar-label">
@@ -750,6 +783,40 @@ async function saveLinkModal(){
 }
 
 // Hook into auth flow — add listenLinks() call
+// ── DAILY QUOTE ──
+async function fetchQuote(){
+  el('quote-text').textContent = '...';
+  el('quote-author').textContent = '';
+  try {
+    // ZenQuotes API - free, no key needed
+    const res = await fetch('https://zenquotes.io/api/today');
+    const data = await res.json();
+    if(data && data[0]){
+      el('quote-text').textContent = '"' + data[0].q + '"';
+      el('quote-author').textContent = '— ' + data[0].a;
+    }
+  } catch(e) {
+    // fallback quotes if API fails (CORS on some browsers)
+    const fallbacks = [
+      {q:"The secret of getting ahead is getting started.", a:"Mark Twain"},
+      {q:"It always seems impossible until it's done.", a:"Nelson Mandela"},
+      {q:"Don't watch the clock; do what it does. Keep going.", a:"Sam Levenson"},
+      {q:"Believe you can and you're halfway there.", a:"Theodore Roosevelt"},
+      {q:"Hard work beats talent when talent doesn't work hard.", a:"Tim Notke"},
+      {q:"The only way to do great work is to love what you do.", a:"Steve Jobs"},
+      {q:"Code is like humor. When you have to explain it, it's bad.", a:"Cory House"},
+      {q:"First, solve the problem. Then, write the code.", a:"John Johnson"},
+    ];
+    // Pick quote based on day of year so it's consistent per day
+    const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+    const q = fallbacks[doy % fallbacks.length];
+    el('quote-text').textContent = '"' + q.q + '"';
+    el('quote-author').textContent = '— ' + q.a;
+  }
+}
+fetchQuote();
+document.getElementById('btn-quote-refresh').addEventListener('click', fetchQuote);
+
 el('btn-prev').addEventListener('click', ()=>{
   if(viewMode==='day'){ const d=new Date(vY,vM,vDay-1); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
   else if(viewMode==='week'){ const d=new Date(vY,vM,vDay-7); vY=d.getFullYear();vM=d.getMonth();vDay=d.getDate(); }
