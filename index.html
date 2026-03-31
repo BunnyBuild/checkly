@@ -444,9 +444,17 @@ html, body {
       </div>
     </div>
   </div>
+  
+</div>
 
   <div id="app-body">
-
+<div id="ai-box" style="display:flex;flex-direction:column;height:100%;">
+  <div id="ai-output" style="flex:1;overflow-y:auto;padding:10px;"></div>
+  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid #eee;">
+    <textarea id="ai-input" placeholder="Ask something..." style="flex:1;"></textarea>
+    <button id="ai-send">Ask</button>
+  </div>
+</div>
   <!-- LEFT PANEL -->
   <div id="left-panel">
     <div class="main">
@@ -562,6 +570,8 @@ html, body {
   </div>
 </div>
 
+  
+
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
@@ -651,6 +661,36 @@ async function seedHabits(){
   }
 }
 
+async function askAI(prompt) {
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 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"
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(data);
+      throw new Error(data.error?.message || "API Error");
+    }
+
+    return data.choices[0].message.content;
+
+  } catch (err) {
+    console.error("AI Error:", err);
+    return "⚠️ Something went wrong";
+  }
+}
 function startListeners(){
   if(unsubH) unsubH();
   unsubH = onSnapshot(hCol(), snap=>{
@@ -1224,6 +1264,21 @@ el('date-picker').addEventListener('change', e=>{
   vY=y; vM=m-1; vDay=d;
   renderGrid();
   setTimeout(()=>{ const c=document.querySelector('.is-today,.cell.active-cell'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('ai-send').onclick = async () => {
+    const input = document.getElementById('ai-input').value;
+    const output = document.getElementById('ai-output');
+
+    if (!input.trim()) return;
+
+    output.innerText = "Thinking...";
+
+    const res = await askAI(input);
+
+    output.innerText = res;
+  };
 });
 </script>
 </body>
