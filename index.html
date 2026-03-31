@@ -444,8 +444,6 @@ html, body {
       </div>
     </div>
   </div>
-  
-</div>
 
   <div id="app-body">
 
@@ -504,8 +502,7 @@ html, body {
       <button class="rp-btn danger" id="rp-close">✕</button>
     </div>
 
-
-<iframe id="right-iframe" src="about:blank"></iframe>
+    <iframe id="right-iframe"></iframe>
 
     <div class="rp-blocked" id="rp-blocked">
       <div>🚫</div>
@@ -564,8 +561,6 @@ html, body {
     </div>
   </div>
 </div>
-
-  
 
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -656,36 +651,6 @@ async function seedHabits(){
   }
 }
 
-async function askAI(prompt) {
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
-      },
-      body: JSON.stringify({
-        model: "llama3-8b-8192",
-        messages: [
-          { role: "user", content: prompt }
-        ]
-      })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error(data);
-      throw new Error(data.error?.message || "API Error");
-    }
-
-    return data.choices[0].message.content;
-
-  } catch (err) {
-    console.error("AI Error:", err);
-    return "⚠️ Something went wrong";
-  }
-}
 function startListeners(){
   if(unsubH) unsubH();
   unsubH = onSnapshot(hCol(), snap=>{
@@ -1260,62 +1225,6 @@ el('date-picker').addEventListener('change', e=>{
   renderGrid();
   setTimeout(()=>{ const c=document.querySelector('.is-today,.cell.active-cell'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
 });
-
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('ai-send').onclick = async () => {
-    const input = document.getElementById('ai-input').value;
-    const output = document.getElementById('ai-output');
-
-    if (!input.trim()) return;
-
-    output.innerText = "Thinking...";
-
-    const res = await askAI(input);
-
-    output.innerText = res;
-  };
-});
-document.getElementById("ai-send").onclick = async function () {
-  const input = document.getElementById("ai-input");
-  const output = document.getElementById("ai-output");
-
-  const prompt = input.value.trim();
-  if (!prompt) return;
-
-  output.innerHTML += "<div>⏳ Thinking...</div>";
-
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
-      },
-      body: JSON.stringify({
-        model: "llama3-8b-8192",
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    const data = await res.json();
-
-    console.log(data); // 🔥 VERY IMPORTANT
-
-    if (!res.ok) {
-      output.innerHTML += `<div style="color:red">Error: ${data.error?.message}</div>`;
-      return;
-    }
-
-    const reply = data.choices[0].message.content;
-
-    output.innerHTML += `<div><b>You:</b> ${prompt}</div>`;
-    output.innerHTML += `<div><b>AI:</b> ${reply}</div>`;
-
-  } catch (err) {
-    console.error(err);
-    output.innerHTML += `<div style="color:red">Failed to fetch</div>`;
-  }
-};
 </script>
 </body>
 </html>
