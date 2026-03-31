@@ -448,13 +448,7 @@ html, body {
 </div>
 
   <div id="app-body">
-<div id="ai-box" style="display:flex;flex-direction:column;height:100%;">
-  <div id="ai-output" style="flex:1;overflow-y:auto;padding:10px;"></div>
-  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid #eee;">
-    <textarea id="ai-input" placeholder="Ask something..." style="flex:1;"></textarea>
-    <button id="ai-send">Ask</button>
-  </div>
-</div>
+
   <!-- LEFT PANEL -->
   <div id="left-panel">
     <div class="main">
@@ -510,7 +504,15 @@ html, body {
       <button class="rp-btn danger" id="rp-close">✕</button>
     </div>
 
-    <iframe id="right-iframe"></iframe>
+    <div id="ai-box" style="display:flex;flex-direction:column;height:100%;">
+  <div id="ai-output" style="flex:1;overflow-y:auto;padding:10px;"></div>
+  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid #eee;">
+    <textarea id="ai-input" placeholder="Ask something..." style="flex:1;"></textarea>
+    <button id="ai-send">Ask</button>
+  </div>
+</div>
+
+<iframe id="right-iframe" src="about:blank"></iframe>
 
     <div class="rp-blocked" id="rp-blocked">
       <div>🚫</div>
@@ -1279,6 +1281,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     output.innerText = res;
   };
+});
+document.getElementById("ai-send").addEventListener("click", async () => {
+  const input = document.getElementById("ai-input");
+  const output = document.getElementById("ai-output");
+
+  const prompt = input.value.trim();
+  if (!prompt) return;
+
+  output.innerHTML += `<div><b>You:</b> ${prompt}</div>`;
+  input.value = "";
+
+  output.innerHTML += `<div id="loading">Thinking...</div>`;
+
+  const response = await askAI(prompt);
+
+  document.getElementById("loading").remove();
+
+  output.innerHTML += `<div><b>AI:</b> ${response}</div>`;
 });
 </script>
 </body>
