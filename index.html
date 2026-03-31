@@ -930,17 +930,22 @@ function listenLinks(){
     renderLinks();
   });
 }
+const BLOCKED_SITES = ['chat.openai.com', 'chatgpt.com', 'gmail.com', 'linkedin.com'];
 
+function isBlockedSite(url){
+  return BLOCKED_SITES.some(site => url.includes(site));
+}
 function openInSidebar(url, name){
   const panel = document.getElementById('right-panel');
   const iframe = document.getElementById('right-iframe');
   const title  = document.getElementById('rp-title');
   const blocked = document.getElementById('rp-blocked');
   const blockedLink = document.getElementById('rp-blocked-link');
-
+  if (isBlockedSite(url)) {
+    window.open(url, '_blank');
+    return;
+  }
   title.textContent = name;
-
-  // FORCE PANEL OPEN
   panel.classList.add('open');
 
   iframe.style.display = 'block';
@@ -949,20 +954,24 @@ function openInSidebar(url, name){
   blockedLink.href = url;
   document.getElementById('rp-newtab').dataset.url = url;
 
-  // Reset iframe (important)
-  iframe.src = "about:blank";
-
+  iframe.src = url;
+  
+  // 🔥 KEY FIX: detect blocked iframe using timeout
   setTimeout(() => {
-    iframe.src = url;
-  }, 50);
+    try {
+      const test = iframe.contentWindow.location.href;
+    } catch (e) {
+      // Cross-origin → allowed
+      return;
+    }
 
-  // Handle blocked sites
-  iframe.onerror = () => {
-    iframe.style.display = 'none';
-    blocked.style.display = 'flex';
-  };
+    // If still blank → likely blocked
+    if (!iframe.contentWindow || iframe.contentWindow.location.href === "about:blank") {
+      iframe.style.display = 'none';
+      blocked.style.display = 'flex';
+    }
+  }, 1500);
 }
-
 document.getElementById('rp-close').addEventListener('click', ()=>{
   document.getElementById('right-panel').classList.remove('open');
   document.getElementById('right-iframe').src = 'about:blank';
