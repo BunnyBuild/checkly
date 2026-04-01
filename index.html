@@ -456,7 +456,8 @@ html, body {
       <button class="mnav-btn" id="btn-next">&#8250;</button>
       <div class="mnav-title" id="mnav-title" id="mnav-title"></div>
       <input type="date" id="date-picker" title="Jump to date" style="border:1px solid #dadce0;border-radius:6px;padding:5px 10px;font-size:13px;font-family:'Google Sans',sans-serif;color:#3c4043;outline:none;cursor:pointer;background:#fff"/>
-      <button class="today-pill" id="btn-today">Today</button>
+      <!-- <button class="today-pill" id="btn-today">Today</button> -->
+      <button class="today-pill" id="btn-shuffle">Shuffle</button>
       <div class="view-toggle">
         <button class="vtbtn active" data-v="day">Day</button>
         <button class="vtbtn" data-v="week">Week</button>
@@ -860,9 +861,30 @@ el('btn-psave').addEventListener('click', async ()=>{
 
 el('btn-pclose').addEventListener('click', closePanel);
 el('panel-overlay').addEventListener('click', e=>{ if(e.target===el('panel-overlay')) closePanel(); });
+  
+async function shuffleHabits(){
+  if(!habits.length) return;
 
+  const shuffled = [...habits];
+
+  // Fisher-Yates shuffle
+  for(let i = shuffled.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  setSync('saving');
+
+  // update order in Firestore
+  const updates = shuffled.map((h, idx) => {
+    return setDoc(hDoc(h.id), { ...h, order: idx }, { merge: true });
+  });
+
+  await Promise.all(updates);
+}
 // ── Add / Delete Habit ──
 el('btn-add').addEventListener('click', addHabit);
+  el('btn-shuffle').addEventListener('click', shuffleHabits);
 el('inp-name').addEventListener('keydown', e=>{ if(e.key==='Enter') addHabit(); });
 
 async function addHabit(){
