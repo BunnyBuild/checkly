@@ -62,6 +62,12 @@ body {
 
 .cal-table tbody tr{border-bottom:1px solid #f1f3f4}
 .cal-table tbody tr:hover{background:#fafafa}
+tr[draggable="true"] {
+  cursor: grab;
+}
+tr[draggable="true"]:active {
+  cursor: grabbing;
+}
 .cal-table tbody td{padding:6px 4px;vertical-align:middle}
 .habit-td{padding-left:0 !important;padding-right:8px !important;width:240px;min-width:240px;max-width:240px}
 .habit-wrap{display:flex;align-items:center;gap:8px;width:220px;min-width:220px;max-width:220px}
@@ -165,6 +171,7 @@ body {
   scrollbar-width:none;
   flex-wrap:nowrap;
 }
+  
 .links-bar::-webkit-scrollbar{display:none}
 .links-bar-label{
   font-size:12px;font-weight:600;color:#5f6368;
@@ -589,7 +596,7 @@ const DEFAULTS = [
 ];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const WDAYS  = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-
+let dragSrcId = null;
 // ── State ──
 let uid=null, habits=[], cells={}, vY, vM;
 let ctxTarget=null; // {habitId, dk}
@@ -726,7 +733,7 @@ function renderGrid(){
   // Body
   let body='';
   habits.forEach(h=>{
-    body += `<tr>
+    body += `<tr draggable="true" data-hid="${h.id}">
       <td class="habit-td">
         <div class="habit-wrap">
           <span class="h-emoji">${h.emoji||'📌'}</span>
@@ -757,6 +764,60 @@ function renderGrid(){
 
 // ── Cell clicks → context menu ──
 el('cal-body').addEventListener('click', e=>{
+  // ── Drag & Drop ──
+el('cal-body').addEventListener('dragstart', e=>{
+  const row = e.target.closest('tr');
+  if(!row) return;
+  dragSrcId = row.dataset.hid;
+  row.style.opacity = 0.5;
+});
+
+el('cal-body').addEventListener('dragend', e=>{
+  const row = e.target.closest('tr');
+  if(row) row.style.opacity = 1;
+});
+
+el('cal-body').addEventListener('dragover', e=>{
+  e.preventDefault(); // IMPORTANT
+  const row = e.target.closest('tr');
+  if(!row) return;
+  row.style.borderTop = '2px solid #1a73e8';
+});
+
+el('cal-body').addEventListener('dragleave', e=>{
+  const row = e.target.closest('tr');
+  if(row) row.style.borderTop = '';
+});
+
+el('cal-body').addEventListener('drop', async e=>{
+  e.preventDefault();
+  const targetRow = e.target.closest('tr');
+  if(!targetRow) return;
+
+  const targetId = targetRow.dataset.hid;
+  if(!dragSrcId || dragSrcId === targetId) return;
+
+  targetRow.style.borderTop = '';
+
+  // reorder array
+  const newHabits = [...habits];
+  const fromIndex = newHabits.findIndex(h=>h.id===dragSrcId);
+  const toIndex   = newHabits.findIndex(h=>h.id===targetId);
+
+  const [moved] = newHabits.splice(fromIndex,1);
+  newHabits.splice(toIndex,0,moved);
+
+  setSync('saving');
+
+  // update order in DB
+  await Promise.all(
+    newHabits.map((h, idx)=>
+      setDoc(hDoc(h.id), { ...h, order: idx }, { merge:true })
+    )
+  );
+
+  dragSrcId = null;
+});
   // Edit habit
   const edit = e.target.closest('.h-edit');
   if(edit){ e.stopPropagation(); openEditModal(edit.dataset.hid, edit.dataset.name, edit.dataset.emoji); return; }
