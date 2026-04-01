@@ -765,10 +765,15 @@ function renderGrid(){
 // ── Cell clicks → context menu ──
 el('cal-body').addEventListener('click', e=>{
   // ── Drag & Drop ──
+// ── Drag & Drop ──
+let dragSrcId = null;
+
 el('cal-body').addEventListener('dragstart', e=>{
   const row = e.target.closest('tr');
   if(!row) return;
+
   dragSrcId = row.dataset.hid;
+  e.dataTransfer.effectAllowed = 'move';
   row.style.opacity = 0.5;
 });
 
@@ -777,39 +782,31 @@ el('cal-body').addEventListener('dragend', e=>{
   if(row) row.style.opacity = 1;
 });
 
+// 🔥 REQUIRED — allow drop
 el('cal-body').addEventListener('dragover', e=>{
-  e.preventDefault(); // IMPORTANT
-  const row = e.target.closest('tr');
-  if(!row) return;
-  row.style.borderTop = '2px solid #1a73e8';
-});
-
-el('cal-body').addEventListener('dragleave', e=>{
-  const row = e.target.closest('tr');
-  if(row) row.style.borderTop = '';
+  e.preventDefault();
 });
 
 el('cal-body').addEventListener('drop', async e=>{
   e.preventDefault();
+
   const targetRow = e.target.closest('tr');
   if(!targetRow) return;
 
   const targetId = targetRow.dataset.hid;
   if(!dragSrcId || dragSrcId === targetId) return;
 
-  targetRow.style.borderTop = '';
-
-  // reorder array
+  // reorder
   const newHabits = [...habits];
+
   const fromIndex = newHabits.findIndex(h=>h.id===dragSrcId);
   const toIndex   = newHabits.findIndex(h=>h.id===targetId);
 
-  const [moved] = newHabits.splice(fromIndex,1);
-  newHabits.splice(toIndex,0,moved);
+  const [moved] = newHabits.splice(fromIndex, 1);
+  newHabits.splice(toIndex, 0, moved);
 
   setSync('saving');
 
-  // update order in DB
   await Promise.all(
     newHabits.map((h, idx)=>
       setDoc(hDoc(h.id), { ...h, order: idx }, { merge:true })
@@ -1418,6 +1415,8 @@ el('date-picker').addEventListener('change', e=>{
   renderGrid();
   setTimeout(()=>{ const c=document.querySelector('.is-today,.cell.active-cell'); if(c) c.scrollIntoView({inline:'center',behavior:'smooth'}); },60);
 });
+
+document.addEventListener('dragover', e => e.preventDefault());
 </script>
 </body>
 </html>
